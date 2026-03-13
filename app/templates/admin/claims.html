@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Claims — Admin{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><i class="fa-solid fa-file-invoice"></i> All Claims</h1>
+</div>
+
+<!-- Status filter tabs -->
+<div class="tab-bar">
+  {% for s in ['', 'pending', 'approved', 'paid', 'fraud_flagged', 'rejected'] %}
+  <a href="{{ url_for('admin.claims', status=s) }}"
+     class="tab {% if status_filter == s %}active{% endif %}">
+    {{ s.replace('_',' ').title() if s else 'All' }}
+  </a>
+  {% endfor %}
+</div>
+
+<div class="section-card">
+  {% if claims.items %}
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>#</th><th>Worker</th><th>Disruption</th><th>Coverage</th>
+          <th>Claim Amount</th><th>Status</th><th>Fraud Score</th><th>Date</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for claim in claims.items %}
+        <tr>
+          <td>{{ claim.id }}</td>
+          <td>{{ claim.worker.email }}</td>
+          <td>{{ claim.disruption.disruption_type.replace('_',' ').title() }}<br>
+            <small>{{ claim.disruption.city }}</small></td>
+          <td>₹{{ '{:,.0f}'.format(claim.policy.coverage_amount) }}</td>
+          <td>₹{{ '{:,.2f}'.format(claim.claim_amount) }}</td>
+          <td><span class="badge badge-{{ claim.status }}">{{ claim.status.replace('_',' ').title() }}</span></td>
+          <td>
+            <div class="fraud-bar">
+              <div class="fraud-fill {% if claim.fraud_score >= 0.7 %}fraud-high{% endif %}"
+                   style="width: {{ '{:.0f}'.format(claim.fraud_score * 100) }}%"></div>
+              <span>{{ '{:.0f}'.format(claim.fraud_score * 100) }}%</span>
+            </div>
+          </td>
+          <td>{{ claim.created_at.strftime('%d %b %Y') }}</td>
+          <td class="action-btns">
+            <form method="POST" action="{{ url_for('admin.evaluate_claim_route', claim_id=claim.id) }}" style="display:inline">
+              <button class="btn-xs btn-secondary">Re-eval</button>
+            </form>
+            {% if claim.status in ('pending', 'fraud_flagged') %}
+              <form method="POST" action="{{ url_for('admin.approve_claim', claim_id=claim.id) }}" style="display:inline">
+                <button class="btn-xs btn-success">Approve</button>
+              </form>
+              <form method="POST" action="{{ url_for('admin.reject_claim', claim_id=claim.id) }}" style="display:inline">
+                <button class="btn-xs btn-danger">Reject</button>
+              </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="pagination">
+      {% if claims.has_prev %}
+        <a href="{{ url_for('admin.claims', page=claims.prev_num, status=status_filter) }}"
+           class="btn-sm btn-secondary">← Prev</a>
+      {% endif %}
+      <span>Page {{ claims.page }} / {{ claims.pages }}</span>
+      {% if claims.has_next %}
+        <a href="{{ url_for('admin.claims', page=claims.next_num, status=status_filter) }}"
+           class="btn-sm btn-secondary">Next →</a>
+      {% endif %}
+    </div>
+  {% else %}
+    <p class="empty-state"><i class="fa-solid fa-circle-check"></i> No claims found.</p>
+  {% endif %}
+</div>
+{% endblock %}

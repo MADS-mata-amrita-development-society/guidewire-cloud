@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}My Claims — GuideWire Cloud{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><i class="fa-solid fa-file-invoice"></i> My Claims</h1>
+  <p class="subtitle">Claims are automatically generated when a disruption is detected in your city.</p>
+</div>
+
+{% if claims %}
+  <div class="section-card">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Disruption</th>
+          <th>City</th>
+          <th>Severity</th>
+          <th>Claim Amount</th>
+          <th>Status</th>
+          <th>Fraud Score</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for claim in claims %}
+        <tr>
+          <td>{{ claim.id }}</td>
+          <td>{{ claim.disruption.disruption_type.replace('_',' ').title() }}</td>
+          <td>{{ claim.disruption.city }}</td>
+          <td>
+            <span class="badge badge-{{ claim.disruption.severity }}">
+              {{ claim.disruption.severity.title() }}
+            </span>
+          </td>
+          <td>₹{{ '{:,.2f}'.format(claim.claim_amount) }}</td>
+          <td>
+            <span class="badge badge-{{ claim.status }}">
+              {{ claim.status.replace('_',' ').title() }}
+            </span>
+          </td>
+          <td>
+            <div class="fraud-bar">
+              <div class="fraud-fill"
+                   style="width: {{ '{:.0f}'.format(claim.fraud_score * 100) }}%"
+                   title="{{ '{:.1f}'.format(claim.fraud_score * 100) }}%">
+              </div>
+              <span>{{ '{:.0f}'.format(claim.fraud_score * 100) }}%</span>
+            </div>
+          </td>
+          <td>{{ claim.created_at.strftime('%d %b %Y') }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <div class="empty-page">
+    <i class="fa-solid fa-circle-check fa-3x"></i>
+    <p>No claims found. You'll be notified automatically when a disruption affects your city.</p>
+  </div>
+{% endif %}
+{% endblock %}

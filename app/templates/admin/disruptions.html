@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Disruptions — Admin{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><i class="fa-solid fa-triangle-exclamation"></i> Disruption Events</h1>
+  <div class="header-actions">
+    <form method="POST" action="{{ url_for('admin.trigger_disruption_check') }}" style="display:inline">
+      <button class="btn-secondary">
+        <i class="fa-solid fa-rotate"></i> Run Detection Scan
+      </button>
+    </form>
+  </div>
+</div>
+
+<div class="section-card">
+  {% if disruptions %}
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>#</th><th>City</th><th>Type</th><th>Severity</th>
+          <th>Description</th><th>Source</th><th>Active?</th><th>Detected</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for d in disruptions %}
+        <tr class="{% if d.is_active %}row-active{% endif %}">
+          <td>{{ d.id }}</td>
+          <td>{{ d.city }}</td>
+          <td>{{ d.disruption_type.replace('_',' ').title() }}</td>
+          <td><span class="badge badge-{{ d.severity }}">{{ d.severity.title() }}</span></td>
+          <td>{{ d.description or '—' }}</td>
+          <td><small>{{ d.source }}</small></td>
+          <td>
+            {% if d.is_active %}
+              <span class="badge badge-active">Active</span>
+            {% else %}
+              <span class="badge badge-grey">Resolved</span>
+            {% endif %}
+          </td>
+          <td>{{ d.detected_at.strftime('%d %b %Y %H:%M') }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="empty-state"><i class="fa-solid fa-circle-check"></i> No disruption events recorded.</p>
+  {% endif %}
+</div>
+{% endblock %}

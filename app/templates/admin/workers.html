@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Workers — Admin{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><i class="fa-solid fa-users"></i> All Workers</h1>
+</div>
+
+<div class="section-card">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>#</th><th>Email</th><th>Name</th><th>City</th><th>Vehicle</th>
+        <th>Claims</th><th>Fraud</th><th>Joined</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for worker in workers.items %}
+      <tr>
+        <td>{{ worker.id }}</td>
+        <td>{{ worker.email }}</td>
+        <td>{{ worker.profile.full_name if worker.profile else '—' }}</td>
+        <td>{{ worker.profile.city if worker.profile else '—' }}</td>
+        <td>{{ worker.profile.vehicle_type.replace('_',' ').title() if worker.profile else '—' }}</td>
+        <td>{{ worker.profile.total_claims if worker.profile else 0 }}</td>
+        <td>
+          {% if worker.profile and worker.profile.fraud_flag %}
+            <span class="badge badge-danger">Flagged</span>
+          {% else %}
+            <span class="badge badge-completed">Clean</span>
+          {% endif %}
+        </td>
+        <td>{{ worker.created_at.strftime('%d %b %Y') }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- Pagination -->
+  <div class="pagination">
+    {% if workers.has_prev %}
+      <a href="{{ url_for('admin.workers', page=workers.prev_num) }}" class="btn-sm btn-secondary">← Prev</a>
+    {% endif %}
+    <span>Page {{ workers.page }} / {{ workers.pages }}</span>
+    {% if workers.has_next %}
+      <a href="{{ url_for('admin.workers', page=workers.next_num) }}" class="btn-sm btn-secondary">Next →</a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

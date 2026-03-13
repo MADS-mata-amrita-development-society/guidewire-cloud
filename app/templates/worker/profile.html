@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}My Profile — GuideWire Cloud{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><i class="fa-solid fa-user-pen"></i> My Profile</h1>
+</div>
+
+<div class="form-card">
+  <form method="POST" action="{{ url_for('worker.profile') }}">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Full Name *</label>
+        <input type="text" name="full_name"
+               value="{{ profile.full_name if profile else '' }}"
+               placeholder="Your full name" required />
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" value="{{ current_user.email }}" disabled />
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="tel" name="phone"
+               value="{{ profile.phone if profile else '' }}"
+               placeholder="+91 98765 43210" />
+      </div>
+      <div class="form-group">
+        <label>City *</label>
+        <select name="city" required>
+          {% set selected_city = profile.city if profile else '' %}
+          {% for c in ['Mumbai','Delhi','Chennai','Kolkata','Bangalore','Hyderabad','Pune','Ahmedabad','Jaipur'] %}
+            <option value="{{ c }}" {% if selected_city == c %}selected{% endif %}>{{ c }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Vehicle Type</label>
+        <select name="vehicle_type">
+          {% set vt = profile.vehicle_type if profile else 'bicycle' %}
+          <option value="bicycle"    {% if vt=='bicycle'    %}selected{% endif %}>🚲 Bicycle</option>
+          <option value="motorcycle" {% if vt=='motorcycle' %}selected{% endif %}>🏍️ Motorcycle</option>
+          <option value="car"        {% if vt=='car'        %}selected{% endif %}>🚗 Car</option>
+          <option value="on_foot"    {% if vt=='on_foot'    %}selected{% endif %}>🚶 On Foot</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Work Area / Zone</label>
+        <input type="text" name="work_area"
+               value="{{ profile.work_area if profile else '' }}"
+               placeholder="e.g. Andheri West, Zone 3" />
+      </div>
+    </div>
+
+    <button type="submit" class="btn-primary">
+      <i class="fa-solid fa-floppy-disk"></i> Save Profile
+    </button>
+  </form>
+</div>
+{% endblock %}

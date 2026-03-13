@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — GuideWire Cloud{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><i class="fa-solid fa-house"></i>
+    Welcome, {{ profile.full_name if profile else current_user.email }}
+  </h1>
+  <p class="subtitle">
+    <i class="fa-solid fa-location-dot"></i>
+    {{ profile.city if profile else '—' }} ·
+    {{ profile.vehicle_type.replace('_',' ').title() if profile else '' }}
+    {% if profile and profile.fraud_flag %}
+      <span class="badge badge-danger">⚠ Fraud Flag</span>
+    {% endif %}
+  </p>
+</div>
+
+<!-- ── Stat Cards ── -->
+<div class="stats-grid">
+  <div class="stat-card {% if active_policy %}stat-green{% else %}stat-grey{% endif %}">
+    <div class="stat-icon"><i class="fa-solid fa-umbrella"></i></div>
+    <div>
+      <div class="stat-label">Active Policy</div>
+      <div class="stat-value">
+        {% if active_policy %}
+          ₹{{ '{:,.0f}'.format(active_policy.coverage_amount) }}
+        {% else %}
+          None
+        {% endif %}
+      </div>
+      {% if active_policy %}
+        <div class="stat-sub">Expires {{ active_policy.week_end.strftime('%d %b %Y') }}</div>
+      {% else %}
+        <a href="{{ url_for('worker.buy_policy') }}" class="btn-sm btn-primary mt-1">Buy Policy</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="stat-card stat-blue">
+    <div class="stat-icon"><i class="fa-solid fa-file-invoice"></i></div>
+    <div>
+      <div class="stat-label">Total Claims</div>
+      <div class="stat-value">{{ profile.total_claims if profile else 0 }}</div>
+      <a href="{{ url_for('worker.claims') }}" class="stat-link">View all →</a>
+    </div>
+  </div>
+
+  <div class="stat-card stat-purple">
+    <div class="stat-icon"><i class="fa-solid fa-money-bill-wave"></i></div>
+    <div>
+      <div class="stat-label">Total Paid Out</div>
+      <div class="stat-value">₹{{ '{:,.2f}'.format(total_paid) }}</div>
+      <a href="{{ url_for('worker.payouts') }}" class="stat-link">View all →</a>
+    </div>
+  </div>
+
+  {% if active_policy %}
+  <div class="stat-card stat-orange">
+    <div class="stat-icon"><i class="fa-solid fa-percent"></i></div>
+    <div>
+      <div class="stat-label">Risk Score</div>
+      <div class="stat-value">{{ '{:.0f}'.format(active_policy.risk_score * 100) }}%</div>
+      <div class="stat-sub">Premium: ₹{{ '{:,.2f}'.format(active_policy.premium_amount) }}/wk</div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<!-- ── Recent Claims ── -->
+<div class="section-card">
+  <div class="section-header">
+    <h3><i class="fa-solid fa-file-invoice"></i> Recent Claims</h3>
+    <a href="{{ url_for('worker.claims') }}">View all</a>
+  </div>
+  {% if recent_claims %}
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>#</th><th>Disruption</th><th>Amount</th><th>Status</th><th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for claim in recent_claims %}
+        <tr>
+          <td>{{ claim.id }}</td>
+          <td>
+            <span class="badge badge-{{ claim.disruption.severity }}">
+              {{ claim.disruption.disruption_type.replace('_',' ').title() }}
+            </span>
+            <small>{{ claim.disruption.city }}</small>
+          </td>
+          <td>₹{{ '{:,.2f}'.format(claim.claim_amount) }}</td>
+          <td><span class="badge badge-{{ claim.status }}">{{ claim.status.replace('_',' ').title() }}</span></td>
+          <td>{{ claim.created_at.strftime('%d %b %Y') }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="empty-state">
+      <i class="fa-solid fa-circle-check"></i>
+      No claims yet — you're all clear!
+    </p>
+  {% endif %}
+</div>
+
+<!-- ── Recent Payouts ── -->
+<div class="section-card">
+  <div class="section-header">
+    <h3><i class="fa-solid fa-money-bill-wave"></i> Recent Payouts</h3>
+    <a href="{{ url_for('worker.payouts') }}">View all</a>
+  </div>
+  {% if recent_payouts %}
+    <table class="data-table">
+      <thead>
+        <tr><th>Ref</th><th>Amount</th><th>Status</th><th>Date</th></tr>
+      </thead>
+      <tbody>
+        {% for payout in recent_payouts %}
+        <tr>
+          <td><code>{{ payout.transaction_ref }}</code></td>
+          <td class="amount-positive">₹{{ '{:,.2f}'.format(payout.amount) }}</td>
+          <td><span class="badge badge-{{ payout.status }}">{{ payout.status.title() }}</span></td>
+          <td>{{ payout.paid_at.strftime('%d %b %Y %H:%M') }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="empty-state"><i class="fa-solid fa-wallet"></i> No payouts yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

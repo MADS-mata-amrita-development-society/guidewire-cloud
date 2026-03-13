@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Buy Policy — GuideWire Cloud{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><i class="fa-solid fa-umbrella"></i> Weekly Insurance Policy</h1>
+  <p class="subtitle">
+    AI-calculated premium based on your location, vehicle type, weather risk, and claim history.
+  </p>
+</div>
+
+<div class="two-col">
+
+  <!-- ── Coverage Selector ── -->
+  <div class="form-card">
+    <h3>Select Coverage Amount</h3>
+    <form method="POST" action="{{ url_for('worker.buy_policy') }}" id="policyForm">
+      <div class="coverage-grid">
+        {% for amount in coverage_options %}
+          <label class="coverage-option {% if estimate and estimate.coverage_amount == amount %}selected{% endif %}">
+            <input type="radio" name="coverage_amount" value="{{ amount }}"
+                   {% if estimate and estimate.coverage_amount == amount %}checked{% endif %}
+                   onchange="document.getElementById('policyForm').submit()" />
+            <span class="coverage-label">₹{{ '{:,}'.format(amount) }}</span>
+            <span class="coverage-sub">per week</span>
+          </label>
+        {% endfor %}
+      </div>
+
+      <input type="hidden" name="action" id="formAction" value="estimate" />
+
+      <div class="btn-row mt-2">
+        <button type="submit" class="btn-secondary"
+                onclick="document.getElementById('formAction').value='estimate'">
+          <i class="fa-solid fa-calculator"></i> Recalculate
+        </button>
+        {% if estimate %}
+          <button type="submit" class="btn-primary"
+                  onclick="document.getElementById('formAction').value='purchase'">
+            <i class="fa-solid fa-cart-shopping"></i>
+            Buy for ₹{{ '{:,.2f}'.format(estimate.premium_amount) }}
+          </button>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+
+  <!-- ── Estimate Panel ── -->
+  {% if estimate %}
+  <div class="estimate-card">
+    <h3>Premium Estimate</h3>
+
+    <div class="estimate-row">
+      <span>Coverage Amount</span>
+      <strong>₹{{ '{:,.0f}'.format(estimate.coverage_amount) }}</strong>
+    </div>
+    <div class="estimate-row">
+      <span>Risk Score</span>
+      <strong>
+        <span class="risk-badge risk-{{ 'high' if estimate.risk_score > 0.65 else ('medium' if estimate.risk_score > 0.35 else 'low') }}">
+          {{ '{:.0f}'.format(estimate.risk_score * 100) }}%
+        </span>
+      </strong>
+    </div>
+    <div class="estimate-row estimate-total">
+      <span>Weekly Premium</span>
+      <strong class="premium-price">₹{{ '{:,.2f}'.format(estimate.premium_amount) }}</strong>
+    </div>
+
+    <div class="risk-breakdown">
+      <h4>Risk Breakdown</h4>
+      <p>
+        Your premium is dynamically calculated using:
+        <br>• <strong>Seasonal weather risk</strong> (35%) — current month patterns
+        <br>• <strong>City location risk</strong> (30%) — historical disaster frequency
+        <br>• <strong>Vehicle vulnerability</strong> (15%) — exposure level of your transport
+        <br>• <strong>Claim history</strong> (20%) — your past claim frequency
+      </p>
+    </div>
+  </div>
+  {% else %}
+  <div class="estimate-card estimate-placeholder">
+    <i class="fa-solid fa-wand-magic-sparkles fa-3x"></i>
+    <p>Select a coverage amount to see your personalised premium estimate.</p>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

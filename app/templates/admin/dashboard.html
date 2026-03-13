@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard — GuideWire Cloud{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><i class="fa-solid fa-gauge"></i> Admin Dashboard</h1>
+</div>
+
+<!-- ── KPI Cards ── -->
+<div class="stats-grid">
+  <div class="stat-card stat-blue">
+    <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+    <div>
+      <div class="stat-label">Total Workers</div>
+      <div class="stat-value">{{ total_workers }}</div>
+      <a href="{{ url_for('admin.workers') }}" class="stat-link">View all →</a>
+    </div>
+  </div>
+
+  <div class="stat-card stat-green">
+    <div class="stat-icon"><i class="fa-solid fa-umbrella"></i></div>
+    <div>
+      <div class="stat-label">Active Policies</div>
+      <div class="stat-value">{{ active_policies }}</div>
+    </div>
+  </div>
+
+  <div class="stat-card stat-orange">
+    <div class="stat-icon"><i class="fa-solid fa-file-invoice"></i></div>
+    <div>
+      <div class="stat-label">Pending Claims</div>
+      <div class="stat-value">{{ pending_claims }}</div>
+      <a href="{{ url_for('admin.claims', status='pending') }}" class="stat-link">Review →</a>
+    </div>
+  </div>
+
+  <div class="stat-card stat-red">
+    <div class="stat-icon"><i class="fa-solid fa-flag"></i></div>
+    <div>
+      <div class="stat-label">Fraud Flagged</div>
+      <div class="stat-value">{{ fraud_flagged }}</div>
+      <a href="{{ url_for('admin.claims', status='fraud_flagged') }}" class="stat-link">Review →</a>
+    </div>
+  </div>
+
+  <div class="stat-card stat-purple">
+    <div class="stat-icon"><i class="fa-solid fa-money-bill-wave"></i></div>
+    <div>
+      <div class="stat-label">Total Paid Out</div>
+      <div class="stat-value">₹{{ '{:,.0f}'.format(total_payout) }}</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Active Disruptions + Simulate ── -->
+<div class="two-col">
+  <div class="section-card">
+    <div class="section-header">
+      <h3><i class="fa-solid fa-triangle-exclamation"></i> Active Disruptions</h3>
+      <form method="POST" action="{{ url_for('admin.trigger_disruption_check') }}" style="display:inline">
+        <button class="btn-sm btn-secondary">
+          <i class="fa-solid fa-rotate"></i> Scan Now
+        </button>
+      </form>
+    </div>
+    {% if active_disruptions %}
+      <table class="data-table">
+        <thead><tr><th>City</th><th>Type</th><th>Severity</th><th>Detected</th></tr></thead>
+        <tbody>
+          {% for d in active_disruptions %}
+          <tr>
+            <td>{{ d.city }}</td>
+            <td>{{ d.disruption_type.replace('_',' ').title() }}</td>
+            <td><span class="badge badge-{{ d.severity }}">{{ d.severity.title() }}</span></td>
+            <td>{{ d.detected_at.strftime('%d %b %H:%M') }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="empty-state"><i class="fa-solid fa-circle-check"></i> No active disruptions.</p>
+    {% endif %}
+  </div>
+
+  <!-- Simulate disruption -->
+  <div class="form-card">
+    <h3><i class="fa-solid fa-flask"></i> Simulate Disruption</h3>
+    <form method="POST" action="{{ url_for('admin.simulate_disruption') }}">
+      <div class="form-group">
+        <label>City</label>
+        <select name="city">
+          {% for c in ['Mumbai','Delhi','Chennai','Kolkata','Bangalore','Hyderabad','Pune'] %}
+            <option>{{ c }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Disruption Type</label>
+        <select name="disruption_type">
+          <option value="heavy_rain">Heavy Rain</option>
+          <option value="flooding">Flooding</option>
+          <option value="extreme_heat">Extreme Heat</option>
+          <option value="curfew">Curfew</option>
+          <option value="traffic_jam">Traffic Jam</option>
+          <option value="storm">Storm</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Severity</label>
+        <select name="severity">
+          <option value="low">Low</option>
+          <option value="moderate">Moderate</option>
+          <option value="high" selected>High</option>
+          <option value="critical">Critical</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <input type="text" name="description" placeholder="Manual test simulation" />
+      </div>
+      <button type="submit" class="btn-primary">
+        <i class="fa-solid fa-bolt"></i> Trigger Disruption
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- ── Recent Claims ── -->
+<div class="section-card">
+  <div class="section-header">
+    <h3><i class="fa-solid fa-file-invoice"></i> Recent Claims</h3>
+    <a href="{{ url_for('admin.claims') }}">View all</a>
+  </div>
+  <table class="data-table">
+    <thead>
+      <tr><th>#</th><th>Worker</th><th>Disruption</th><th>Amount</th><th>Status</th><th>Fraud Score</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+      {% for claim in recent_claims %}
+      <tr>
+        <td>{{ claim.id }}</td>
+        <td>{{ claim.worker.email }}</td>
+        <td>{{ claim.disruption.disruption_type.replace('_',' ').title() }} / {{ claim.disruption.city }}</td>
+        <td>₹{{ '{:,.2f}'.format(claim.claim_amount) }}</td>
+        <td><span class="badge badge-{{ claim.status }}">{{ claim.status.replace('_',' ').title() }}</span></td>
+        <td>{{ '{:.0f}'.format(claim.fraud_score * 100) }}%</td>
+        <td class="action-btns">
+          {% if claim.status in ('pending', 'fraud_flagged') %}
+            <form method="POST" action="{{ url_for('admin.approve_claim', claim_id=claim.id) }}" style="display:inline">
+              <button class="btn-xs btn-success">Approve</button>
+            </form>
+            <form method="POST" action="{{ url_for('admin.reject_claim', claim_id=claim.id) }}" style="display:inline">
+              <button class="btn-xs btn-danger">Reject</button>
+            </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- ── Fraud-Flagged Workers ── -->
+{% if flagged_workers %}
+<div class="section-card">
+  <div class="section-header">
+    <h3><i class="fa-solid fa-flag"></i> Fraud-Flagged Workers</h3>
+  </div>
+  <table class="data-table">
+    <thead><tr><th>Name</th><th>City</th><th>Total Claims</th></tr></thead>
+    <tbody>
+      {% for w in flagged_workers %}
+      <tr>
+        <td>{{ w.full_name }}</td>
+        <td>{{ w.city }}</td>
+        <td>{{ w.total_claims }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}
