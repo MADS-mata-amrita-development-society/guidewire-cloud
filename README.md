@@ -94,6 +94,9 @@ Claims are processed using a **risk scoring system**. High-risk claims or zones 
 * **Lightweight Proof-of-Presence (Triggered Verification):**  
 In cases where a claim is flagged as suspicious, the system can request a quick proof-of-presence check. This involves the user taking a real-time selfie while holding up a randomly generated code on paper. This ensures liveness, prevents replay attacks, and confirms that the user is physically present and actively responding, adding a human verification layer without impacting normal user experience.
 
+* **Pre-existing passive fix:**
+Our system already partially addresses this issue. A driver cannot keep claiming insurance for multiple incidents. Our deep learning model is trained to identify this and will automatically flag for review if it notices that a user has been claiming insurance from many locations for many such incidents. Additionally, no user will be able to claim insurance beyond their tier's limits
+
 >[!NOTE]
 >If a user is flagged for any of these activities, the user can be bought up for manual review to consider adverse circumastances.
 
