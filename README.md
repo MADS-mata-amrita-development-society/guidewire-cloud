@@ -69,5 +69,27 @@ AI is the main part of the claim approval system. We are integrating it in a few
 
 ---
 
+## 6. Multi-Layer Fraud Prevention & Trust System
+
+Given the rise of coordinated attacks using GPS spoofing, Aegis moves beyond single-point location verification and adopts a **multi-signal trust architecture** to ensure system integrity.
+
+* **Sensor Fusion & Behavioral Validation:**  
+We validate claims using device-level motion data such as **IMU, gyroscope, and accelerometer readings**. These are cross-checked against GPS movement to ensure consistency (e.g., real movement should show acceleration, turns, and vibration patterns). Any mismatch between GPS data and physical device motion is flagged as anomalous.
+
+* **Cross-Verification (GPS vs Network Reality):**  
+GPS coordinates are verified against **IP address, cell tower triangulation, and WiFi signals**. If a user claims to be in a disruption zone but their network origin indicates otherwise, the claim is marked high-risk.
+
+* **Cluster & Event-Based Fraud Detection:**  
+The system detects coordinated fraud attempts (e.g., multiple users triggering the same event simultaneously from similar patterns). Such clusters are flagged, and claims are either throttled or escalated for manual review via the Admin dashboard.
+
+* **Secure Device Validation:**  
+To prevent spoofed environments:
+  - Rooted/jailbroken devices are blocked  
+  - Devices with developer mode enabled are restricted  
+  - Emulator-based access is detected and denied  
+
+* **Dynamic Risk-Based Payout Control:**  
+Claims are processed using a **risk scoring system**. High-risk claims or zones trigger delayed payouts and additional verification, ensuring the liquidity pool is protected from mass-drain attacks.
+
 
 **Pitch Video**: https://youtu.be/zgT5l1EeISU
