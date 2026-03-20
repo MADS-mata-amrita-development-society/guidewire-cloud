@@ -1,170 +1,73 @@
-# Aegis
-### AI-Powered Parametric Income Insurance for Gig Delivery Workers
+# Aegis 
+>AI-Powered Income Insurance for Gig Workers
 
-An entire insurance ecosystem with multiple monitoring and review web dashboards along with a mobile app for gig workers.
+## Introduction
+Aegis (Zeus' shield in Greek mythology) is an AI powered insurance ecosystem built for the modern quick commerce revolution. 
 
-> When disruptions stop you from working, we pay you automatically. No forms. No waiting.
+With the prevalent boom of fast moving platforms like Swiggy, Zomato, Blinkit, Zepto, etc, that ensure delivery of almost any desired product, from groceries to technology, there has also been a huge increase in the gig-based job market primarily consisting of delivery drivers for said platforms. These drivers work daily wages and earn based on the number of deliveries they do. Making it a very fragile source of income. If at any point they are forced to skip working days due to any natural disaster or political strike/curfew, they are left with no salary for the missed deliveries because there is no safety net in effect, yet.
 
----
+Aegis is here to solve that problem exactly. This repository is the codebase for the PWA (Progressive Web Application) that we are building for everyone that will use this app (Gig workers, QCommerce company managers and Aegis admins).
 
-## The Problem
-
-India's gig delivery workers (Zomato, Swiggy, Zepto, Amazon, Flipkart) lose 20-30% of their monthly income when external disruptions hit — heavy rain, floods, extreme heat, pollution spikes, local curfews, or sudden zone closures. They have no safety net. When the world stops them from working, they bear the full financial loss alone.
-
----
-
-## Our Solution
-
-An AI-powered parametric insurance platform that protects gig workers' income against uncontrollable external disruptions. The platform monitors real-time environmental and social conditions, and when a trigger threshold is crossed, it automatically initiates a claim and processes an instant payout — without the worker having to do anything.
-
-**B2B Approach & Rollout:**
-Instead of onboarding workers individually, we partner directly with gig platforms for seamless integration, automatic premium handling, and faster scale. We start by launching pilot programs in high-risk urban areas, optimizing with real data before expanding nationwide. The clients can monitor claims and report concerns directly for manual intervention.
-
-### How It Works
-```
-Worker Onboards -> Buys Weekly Policy -> Disruption Detected -> Claim Auto-Triggered -> Instant Payout
-```
-
-No paperwork. No calls. No waiting. Just protection that works silently in the background.
+Rather than targeting individual drivers, we have planned to take a B2B approach, partnering with the gig companies, while ensuring no additional effort is required from our clients. We plan to fully handle the insurance tier management, claims and payouts autonomously from our end.
 
 ---
 
-## Personas
+## 1. Requirements
 
-1. **Gig delivery worker:** Our primary users. They face long hours, no fixed income, and no safety net during disruptions like rain or strikes. They need simple onboarding, an easy mobile app, and instant payouts.
-2. **Gig platforms (B2B):** We partner directly with gig platforms (food, grocery delivery, e-commerce) to provide better retention and consistent delivery performance. Seamless integration handling automatic premiums at scale.
-3. **Admin/Insurance side:** Responsible for monitoring claims across the ecosystem via web dashboards, ensuring fraud prevention, mitigating losses, and resolving escalated concerns with manual intervention.
+### Personas
+We identified three key personas to meet all the users' requirements:
+* **Gig Delivery Driver (End User):** Faces long hours, no fixed income, and no safety net during disruptions like rain or strikes. They need a simple interface to apply for claims, manage tiers, and track claim history.
+* **Q-Commerce Manager (B2B Client):** They need better retention and consistent delivery performance. They get a monitoring dashboard with an overview of everything. This includes geographic overviews (e.g., "50 riders in Zone A are grounded due to heavy flooding in Sarjapur") and see metrics like churn rate, with no administrative overhead from their side.
+* **Aegis Admin:** Responsible for managing different clients, tweaking insurance modules, monitoring company analytics, reviewing AI fraud flagging, and manually overriding the AI model's parameters if needed.
 
----
 
-## Parametric Triggers
-
-Claims are initiated automatically when real-time data crosses defined thresholds:
-
-| Trigger       | Condition                  | Income Impact             |
-|---------------|----------------------------|---------------------------|
-| Heavy Rain    | Rainfall > X mm/hr         | Deliveries halted         |
-| Extreme Heat  | Temperature > 42 degrees C | Cannot work outdoors      |
-| Air Quality   | AQI > 300 (Severe)         | Unsafe working conditions |
-| Flooding      | Flood alert in zone        | Area inaccessible         |
-| Curfew/Strike | Official zone closure      | Cannot access pickup/drop |
-
-Workers are insured for lost income only — not for the disruption itself.
+### Application Workflow:
+1. We partner with a gig platform (B2B), automatically covering their drivers based on our personalized AI baseline premium.
+2. If a disruption occurs (heavy rain, strike), the driver logs into the Aegis app.
+3. The system checks external APIs against various parameters and features. If found valid, the claim is auto-approved by our AI.
+4. If the AI flags an anomaly, it gets sent to the Aegis Admin dashboard for manual resolution.
+5. The B2B client views the live per-user and overall claim tracker on their dashboard to monitor the safety of their partners.
 
 ---
 
-## Weekly Premium Model
+## 2. Weekly Premium Model
 
-Gig workers operate week-to-week, so our pricing is structured on a weekly basis.
+The pricing structure is aligned with weekly gig-worker pay cycles. We propose three tiers available via the worker dashboard:
+* **Basic Tier (Starting):** The entry-level tier covering up to 50% of average earnings. While designed for low-risk zones, workers can earn a free upgrade to higher tiers based on consistent performance.
+* **Standard Tier:** Covers up to 75% of average earnings. Best for moderate-risk zones with occasional disruptions.
+* **Premium Tier:** Covers up to 100% of average earnings. Designed for high-risk zones with frequent disruptions.
 
-### Three Tiers of Affordability
-1. **Basic Tier (Starting)**: Entry-level tier covering up to 50% of average earnings. While designed for low-risk zones, workers can earn a free upgrade to higher tiers based on consistent performance.
-2. **Standard Tier**: Medium premium; covers up to 75% of average earnings. Best for moderate-risk zones with occasional disruptions.
-3. **Premium Tier**: Highest premium; covers up to 100% of average earnings. Designed for high-risk zones with frequent disruptions.
+> [!NOTE]
+> Workers can also manually adjust their tier at any time before the weekly policy renews.
 
-Premiums are calculated dynamically using AI based on:
-- Worker's delivery zone (historical risk data)
-- Platform type (food vs grocery vs ecommerce)
-- Local weather forecasts for the upcoming week
-- Worker's claim history
-
-Low-risk zones = lower weekly premium. Coverage amount is tied to the worker's average weekly earnings.
-
----
-
-## Key Features
-
-### AI-Powered Risk Assessment
-- Dynamic weekly premium calculation using ML
-- Hyper-local risk modeling per delivery zone
-- Predictive disruption forecasting
-
-### Intelligent Fraud Detection
-- Anomaly detection on claim patterns
-- GPS location validation during disruption windows
-- Duplicate claim prevention
-- Cross-referencing worker activity vs claimed disruption
-
-### Parametric Automation
-- Real-time monitoring of weather, AQI, and social disruption APIs
-- Zero-touch automatic claim initiation
-- Instant payout processing on confirmed triggers
-
-### Dual Dashboard
-- Worker View: Active coverage, earnings protected, payout history
-- Admin/Insurer View: Loss ratios, active claims, predictive analytics
+**Parametric Triggers:**
+Once the plan is activated, the user will be able to claim insurance for their missed salary in times of:
+* **Natural Disasters:** Such as heavy rain or flooding, verified via Weather APIs.
+* **Political Strikes/Curfews:** Verified via localized data and news APIs.
+Because these triggers are parameter-based (data-driven), we don't need manual adjusters to verify most claims.
 
 ---
 
-## Tech Stack
-
-| Layer | Technology |
-| --- | --- |
-| Web Frontend | React (Web Dashboards) |
-| Mobile Frontend | React Native |
-| Backend API | Python FastAPI |
-| AI/ML Models | Deep Learning Model |
-| Database | Supabase |
-| External APIs | OpenWeatherMap, OpenAQ |
-| Payment Gateway | Razorpay (Test Mode) |
+## 3. Web vs. Mobile Platform
+We chose to build Aegis as a **Progressive Web Application (PWA)**. 
+Gig workers often use budget smartphones where downloading and updating heavy native mobile apps is a hassle. A PWA gives them a user-friendly application they can access from anywhere, right on their home screen, without taking up massive storage. Simultaneously, our B2B clients and Aegis Admins need complex, data-heavy web dashboards. A unified PWA approach allows us to serve the mobile delivery driver and the desktop admin from the same ecosystem.
 
 ---
 
-## Application Workflow
-
-1. Onboarding — Worker registers, links delivery platform, sets weekly earnings baseline
-2. Policy Purchase — AI calculates weekly premium based on zone and risk profile
-3. Active Coverage — Platform monitors triggers 24/7 in the background
-4. Disruption Detected — System validates trigger against threshold
-5. Claim Auto-Initiated — No action required from worker
-6. Fraud Check — AI validates claim legitimacy
-7. Instant Payout — Lost income transferred via UPI/mock payment gateway
+## 4. AI/ML Integration
+AI is the main part of the claim approval system. We are integrating it in a few key ways:
+* **Premium Calculation:** We use deep learning models to deal with region-dependent information, trained on relevant features like location risk, weather forecasts, and historical claim frequency to calculate the baseline premium.
+* **Fraud Detection:** Our fraud detection engine is an anomaly detection model that catches false insurance claims. It generates reports from the AI system directly to the Admin dashboard, preventing system abuse.
 
 ---
 
-## Phase Roadmap
-
-### Phase 1 — Ideation and Foundation (Weeks 1-2)
-- [x] Problem definition and persona research
-- [x] Weekly premium model design
-- [x] Parametric trigger definition
-- [ ] Tech stack finalization
-- [ ] Initial Figma prototype
-
-### Phase 2 — Automation and Protection (Weeks 3-4)
-- [ ] Worker registration and onboarding
-- [ ] Insurance policy management
-- [ ] Dynamic premium calculation (AI)
-- [ ] Claims management system
-- [ ] 3-5 automated disruption triggers via APIs
-
-### Phase 3 — Scale and Optimise (Weeks 5-6)
-- [ ] Advanced fraud detection
-- [ ] Simulated instant payout system
-- [ ] Intelligent worker and admin dashboard
-- [ ] Final demo video and pitch deck
+## 5. Tech Stack
+* **Frontend:** React.js (for PWA and Web Dashboards).
+* **Database:** PostgreSQL database on a self-hosted Supabase instance (for data privacy, since we are dealing with financial information and need relational structures).
+* **AI/ML Engine:** Python for anomaly detection training and deep learning models.
+* **External APIs:** OpenWeather API (for natural disaster triggers) and Payment Gateways.
 
 ---
 
-## Team
 
-| Name | Role                          |
-|------|-------------------------------|
-| TBD  | Team Lead, Strategy, Frontend |
-| TBD  | UI/UX Design                  |
-| TBD  | Backend and APIs              |
-| TBD  | AI/ML                         |
-| TBD  | Mobile / DevOps               |
-
----
-
-## Submission — Phase 1
-
-- GitHub Repository — you are here
-- 2-Minute Strategy Video — link TBD
-- This README serves as the Idea Document
-
----
-
-Built for Guidewire DEVTrails 2026 — Unicorn Chase  
-Theme: Seed. Scale. Soar.
+**Pitch Video**: https://youtu.be/zgT5l1EeISU
