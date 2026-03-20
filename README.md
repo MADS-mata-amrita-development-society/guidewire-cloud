@@ -91,5 +91,14 @@ To prevent spoofed environments:
 * **Dynamic Risk-Based Payout Control:**  
 Claims are processed using a **risk scoring system**. High-risk claims or zones trigger delayed payouts and additional verification, ensuring the liquidity pool is protected from mass-drain attacks.
 
+* **Lightweight Proof-of-Presence (Triggered Verification):**  
+In cases where a claim is flagged as suspicious, the system can request a quick proof-of-presence check. This involves the user taking a real-time selfie while holding up a randomly generated code on paper. This ensures liveness, prevents replay attacks, and confirms that the user is physically present and actively responding, adding a human verification layer without impacting normal user experience.
+
+>[!NOTE]
+>If a user is flagged for any of these activities, the user can be bought up for manual review to consider adverse circumastances.
+
+---
 
 **Pitch Video**: https://youtu.be/zgT5l1EeISU
+
+---
