@@ -181,12 +181,11 @@ that are objectively verifiable — not personal health events.
 ## 7. ML MODEL — PREMIUM CALCULATION
 ----------------------------------------------------------------
 
-**Model Type:** Linear Regression (no LLMs, no heavy deep learning)
-**Why Linear Regression:**
-- Lightweight, fast, low infrastructure cost
-- Interpretable — easy to explain to regulators and judges
-- Sufficient for the structured tabular data we are working with
-- Does not require GPU or expensive compute
+**Model Type:** Deep Learning Model
+**Why Deep Learning:**
+- Capable of modeling complex, non-linear relationships across hundreds of parameters (hyper-local weather grids, traffic data, historical demand).
+- Highly accurate anomaly detection for preventing fraudulent claims.
+- Can ingest multiple, high-dimensional datasets simultaneously.
 
 **Input Features:**
 - zone_risk_score (historical disruption frequency per zone)
@@ -204,8 +203,7 @@ that are objectively verifiable — not personal health events.
 - Synthetic dataset generated based on Indian city weather patterns, historical AQI data, and gig worker income estimates
 - Model retrained periodically as real claim data accumulates
 
-**Hosting:** Model served via a lightweight REST API endpoint
-*No LLMs used anywhere in the system. All intelligence is rule-based or ML model-based to keep infrastructure costs minimal.*
+**Hosting:** Model served via a FastAPI endpoint
 
 ---
 
@@ -221,8 +219,8 @@ Fraud detection is rule-based and ML-assisted. No LLMs involved.
 - Frequency check: worker filing unusually high number of claims compared to zone average
 
 **ML-Based Anomaly Detection (run second):**
-- Model: Isolation Forest or simple statistical outlier detection
-- Flags claims that deviate significantly from historical patterns
+- Model: Deep Learning based anomaly detection
+- Flags claims that deviate significantly from typical historical/event-cluster geometries.
 - Features: claim frequency, payout amount, zone, time of day, weather severity at time of claim
 
 **Escalation Flow:**
@@ -241,27 +239,27 @@ Fraud detection is rule-based and ML-assisted. No LLMs involved.
 ----------------------------------------------------------------
 
 **Frontend:**
-- Web App: React / Next.js
-- Mobile App: React Native (shared component logic with web)
+- Web App: React (Admin / Platform Dashboards)
+- Mobile App: React Native
 - Separate views for Worker, Dark Store Manager, Insurance Admin, and Developer roles
 
 **Backend:**
-- REST API server (tech to be finalized — Python FastAPI recommended for easy ML model integration)
+- REST API server: Python FastAPI
 - Handles user auth, policy management, claim processing, payout initiation
 
 **ML Services:**
-- Premium Calculation Service (Linear Regression model)
-- Fraud Detection Service (rule engine + anomaly detection)
-- Both served as internal microservices or simple API endpoints
+- Premium Calculation Service (Deep Learning model)
+- Fraud Detection Service (Rule engine + Deep Learning anomaly detection)
+- Served as internal microservices via FastAPI
 
 **Database:**
 - Workers, policies, claims, payouts, zone data
-- Relational DB recommended (PostgreSQL)
+- Supabase (PostgreSQL under the hood, provides out-of-the-box realtime APIs)
 
 **External APIs:**
 - Weather API (OpenWeatherMap free tier or mock)
 - AQI API (OpenAQ or mock)
-- Payment Gateway (Razorpay test mode / Stripe sandbox / UPI mock)
+- Payment Gateway (Razorpay test mode)
 - Social disruption feed (mock or manual input by manager)
 
 **Trigger Engine:**
@@ -341,18 +339,16 @@ Full claim record stored: trigger data, fraud score, approval method, payout amo
 
 | Layer | Technology |
 | --- | --- |
-| Web Frontend | React / Next.js |
+| Web Frontend | React (Web Dashboards) |
 | Mobile Frontend | React Native |
-| Backend API | Python FastAPI (recommended) or Node.js |
-| ML Models | scikit-learn (Linear Regression, Isolation Forest) |
-| Database | PostgreSQL |
+| Backend API | Python FastAPI |
+| ML Models | Deep Learning Model for Premium Calculation and Anomaly Detection |
+| Database | Supabase |
 | Weather API | OpenWeatherMap (free tier) or mock |
 | AQI API | OpenAQ or mock |
-| Payment Gateway | Razorpay test mode / Stripe sandbox / UPI mock |
-| Hosting | TBD (AWS free tier / Vercel / Railway) |
-| Auth | JWT-based authentication |
-
-*No LLMs used. All AI/ML is lightweight, rule-based, or classical ML to minimize infrastructure cost.*
+| Payment Gateway | Razorpay test mode |
+| Hosting | TBD |
+| Auth | Embedded through Supabase / JWT |
 
 ---
 
@@ -371,7 +367,7 @@ Full claim record stored: trigger data, fraud score, approval method, payout amo
 **Phase 2 — Automation and Protection (March 21 - April 4)**
 - Worker registration and onboarding flow
 - Insurance policy creation and management
-- Dynamic premium calculation (Linear Regression model live)
+- Dynamic premium calculation (Deep Learning model live)
 - Claims management system
 - 3-5 automated disruption triggers via APIs
 - Basic fraud detection (rule-based)
@@ -379,8 +375,8 @@ Full claim record stored: trigger data, fraud score, approval method, payout amo
 *Deadline: April 4*
 
 **Phase 3 — Scale and Optimise (April 5-17)**
-- Advanced fraud detection (ML anomaly detection)
-- Simulated instant payout system (mock gateway)
+- Advanced fraud detection (Deep Learning anomaly detection)
+- Simulated instant payout system (Razorpay mock)
 - Full worker and admin dashboards
 - Dark store manager reporting flow
 - Developer analytics dashboard
@@ -394,8 +390,7 @@ Full claim record stored: trigger data, fraud score, approval method, payout amo
 ----------------------------------------------------------------
 
 To keep scope manageable and costs low:
-- No LLMs or generative AI anywhere in the system
-- No real payment processing (mock/sandbox only)
+- No real payment processing (Razorpay test mode only)
 - No real platform API integration (Zomato/Swiggy APIs are simulated)
 - No health, life, accident, or vehicle insurance features
 - No monthly pricing model (weekly only, by design)

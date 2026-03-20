@@ -98,14 +98,15 @@ Low-risk zones = lower weekly premium. Coverage amount is tied to the worker's a
 
 ## Tech Stack
 
-| Layer    | Technology                                 |
-|----------|--------------------------------------------|
-| Frontend | TBD                                        |
-| Backend  | TBD                                        |
-| AI/ML    | TBD                                        |
-| Database | TBD                                        |
-| APIs     | Weather API, AQI API, Mock Payment Gateway |
-| DevOps   | TBD                                        |
+| Layer | Technology |
+| --- | --- |
+| Web Frontend | React (Web Dashboards) |
+| Mobile Frontend | React Native |
+| Backend API | Python FastAPI |
+| AI/ML Models | Deep Learning Model |
+| Database | Supabase |
+| External APIs | OpenWeatherMap, OpenAQ |
+| Payment Gateway | Razorpay (Test Mode) |
 
 ---
 
