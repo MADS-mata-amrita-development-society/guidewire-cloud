@@ -1,6 +1,7 @@
-# guidewire-cloud
-# Project Name
+# Aegis
 ### AI-Powered Parametric Income Insurance for Gig Delivery Workers
+
+An entire insurance ecosystem with multiple monitoring and review web dashboards along with a mobile app for gig workers.
 
 > When disruptions stop you from working, we pay you automatically. No forms. No waiting.
 
@@ -16,6 +17,9 @@ India's gig delivery workers (Zomato, Swiggy, Zepto, Amazon, Flipkart) lose 20-3
 
 An AI-powered parametric insurance platform that protects gig workers' income against uncontrollable external disruptions. The platform monitors real-time environmental and social conditions, and when a trigger threshold is crossed, it automatically initiates a claim and processes an instant payout — without the worker having to do anything.
 
+**B2B Approach & Rollout:**
+Instead of onboarding workers individually, we partner directly with gig platforms for seamless integration, automatic premium handling, and faster scale. We start by launching pilot programs in high-risk urban areas, optimizing with real data before expanding nationwide. The clients can monitor claims and report concerns directly for manual intervention.
+
 ### How It Works
 ```
 Worker Onboards -> Buys Weekly Policy -> Disruption Detected -> Claim Auto-Triggered -> Instant Payout
@@ -25,12 +29,11 @@ No paperwork. No calls. No waiting. Just protection that works silently in the b
 
 ---
 
-## Persona
+## Personas
 
-Primary: Food and grocery delivery partners operating on platforms like Zomato, Swiggy, Zepto, and Blinkit across Indian cities.
-
-Coverage: Income loss ONLY — for hours/wages lost due to external disruptions.  
-Excluded: Health, life, accidents, vehicle repairs.
+1. **Gig delivery worker:** Our primary users. They face long hours, no fixed income, and no safety net during disruptions like rain or strikes. They need simple onboarding, an easy mobile app, and instant payouts.
+2. **Gig platforms (B2B):** We partner directly with gig platforms (food, grocery delivery, e-commerce) to provide better retention and consistent delivery performance. Seamless integration handling automatic premiums at scale.
+3. **Admin/Insurance side:** Responsible for monitoring claims across the ecosystem via web dashboards, ensuring fraud prevention, mitigating losses, and resolving escalated concerns with manual intervention.
 
 ---
 
@@ -53,6 +56,11 @@ Workers are insured for lost income only — not for the disruption itself.
 ## Weekly Premium Model
 
 Gig workers operate week-to-week, so our pricing is structured on a weekly basis.
+
+### Three Tiers of Affordability
+1. **Basic Tier (Starting)**: Entry-level tier covering up to 50% of average earnings. While designed for low-risk zones, workers can earn a free upgrade to higher tiers based on consistent performance.
+2. **Standard Tier**: Medium premium; covers up to 75% of average earnings. Best for moderate-risk zones with occasional disruptions.
+3. **Premium Tier**: Highest premium; covers up to 100% of average earnings. Designed for high-risk zones with frequent disruptions.
 
 Premiums are calculated dynamically using AI based on:
 - Worker's delivery zone (historical risk data)

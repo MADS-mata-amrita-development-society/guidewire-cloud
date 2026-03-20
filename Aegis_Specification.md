@@ -16,7 +16,7 @@ local curfews, and sudden zone closures — can reduce a worker's income by
 20-30% in a single week. When these events occur, the worker bears the full
 financial loss with no recourse. No insurance. No compensation. No support.
 
-GigShield solves this by providing automated, parametric income insurance
+Aegis solves this by providing automated, parametric income insurance
 that pays out instantly when a verified disruption occurs — without the worker
 ever having to file a claim manually.
 
@@ -25,7 +25,7 @@ ever having to file a claim manually.
 ## 2. PRODUCT OVERVIEW
 ----------------------------------------------------------------
 
-GigShield is a parametric insurance platform built for gig delivery workers.
+Aegis is a parametric insurance platform built for gig delivery workers.
 It monitors real-time environmental and social disruption data, and when a
 trigger threshold is crossed, it automatically validates, approves, and
 processes a payout to the affected worker.
@@ -79,12 +79,12 @@ workers, who are paid weekly by their platforms.
 ## 4. COVERAGE SCOPE
 ----------------------------------------------------------------
 
-### What GigShield Covers:
+### What Aegis Covers:
 - Income lost during verified external disruption events
 - Partial income loss (e.g., 3 hours lost during a 2-hour rain event)
 - Weekly coverage tied to the worker's average weekly earnings baseline
 
-### What GigShield Does NOT Cover:
+### What Aegis Does NOT Cover:
 - Health or medical expenses
 - Life insurance
 - Vehicle damage or repair
@@ -151,29 +151,29 @@ trained on the following features:
 - Upcoming week's weather forecast risk score
 - Zone-level flood / heat / AQI risk index
 
-### Premium Tiers (Indicative):
+### Premium Tiers:
 
-**Tier 1 — Basic**
+**Tier 1 — Basic (Starting)**
 - Weekly Premium: Low
 - Coverage: Up to 50% of average weekly earnings
-- Best for: Workers in low-risk zones
+- Best for: Workers in low-risk zones. Workers can earn a free upgrade to higher tiers based on consistent performance.
 
 **Tier 2 — Standard**
 - Weekly Premium: Medium
 - Coverage: Up to 75% of average weekly earnings
-- Best for: Workers in moderate-risk zones
+- Best for: Moderate-risk zones with occasional disruptions
 
 **Tier 3 — Premium**
-- Weekly Premium: High
+- Weekly Premium: Highest
 - Coverage: Up to 100% of average weekly earnings
-- Best for: Workers in high-risk zones (coastal, flood-prone)
+- Best for: High-risk zones with frequent disruptions
 
 *Workers can manually upgrade or downgrade their tier at any time from their dashboard before the weekly policy renews.*
 
 ### Sick Leave Note:
-GigShield does not cover sick leave. Sick leave is the responsibility of
+Aegis does not cover sick leave. Sick leave is the responsibility of
 the gig platform (Zomato, Swiggy, etc.) or the worker's own savings.
-GigShield exclusively covers external, environmental, and social disruptions
+Aegis exclusively covers external, environmental, and social disruptions
 that are objectively verifiable — not personal health events.
 
 ---
