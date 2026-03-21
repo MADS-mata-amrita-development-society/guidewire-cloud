@@ -69,5 +69,39 @@ AI is the main part of the claim approval system. We are integrating it in a few
 
 ---
 
+## 6. Multi-Layer Fraud Prevention & Trust System
+
+Given the rise of coordinated attacks using GPS spoofing, Aegis moves beyond single-point location verification and adopts a **multi-signal trust architecture** to ensure system integrity.
+
+* **Sensor Fusion & Behavioral Validation:**  
+We validate claims using device-level motion data such as **IMU, gyroscope, and accelerometer readings**. These are cross-checked against GPS movement to ensure consistency (e.g., real movement should show acceleration, turns, and vibration patterns). Any mismatch between GPS data and physical device motion is flagged as anomalous.
+
+* **Cross-Verification (GPS vs Network Reality):**  
+GPS coordinates are verified against **IP address, cell tower triangulation, and WiFi signals**. If a user claims to be in a disruption zone but their network origin indicates otherwise, the claim is marked high-risk.
+
+* **Cluster & Event-Based Fraud Detection:**  
+The system detects coordinated fraud attempts (e.g., multiple users triggering the same event simultaneously from similar patterns). Such clusters are flagged, and claims are either throttled or escalated for manual review via the Admin dashboard.
+
+* **Secure Device Validation:**  
+To prevent spoofed environments:
+  - Rooted/jailbroken devices are blocked  
+  - Devices with developer mode enabled are restricted  
+  - Emulator-based access is detected and denied  
+
+* **Dynamic Risk-Based Payout Control:**  
+Claims are processed using a **risk scoring system**. High-risk claims or zones trigger delayed payouts and additional verification, ensuring the liquidity pool is protected from mass-drain attacks.
+
+* **Lightweight Proof-of-Presence (Triggered Verification):**  
+In cases where a claim is flagged as suspicious, the system can request a quick proof-of-presence check. This involves the user taking a real-time selfie while holding up a randomly generated code on paper. This ensures liveness, prevents replay attacks, and confirms that the user is physically present and actively responding, adding a human verification layer without impacting normal user experience.
+
+* **Pre-existing passive fix:**
+Our system already partially addresses this issue. A driver cannot keep claiming insurance for multiple incidents. Our deep learning model is trained to identify this and will automatically flag for review if it notices that a user has been claiming insurance from many locations for many such incidents. Additionally, no user will be able to claim insurance beyond their tier's limits
+
+>[!NOTE]
+>If a user is flagged for any of these activities, the user can be bought up for manual review to consider adverse circumstances.
+
+---
 
 **Pitch Video**: https://youtu.be/zgT5l1EeISU
+
+---
