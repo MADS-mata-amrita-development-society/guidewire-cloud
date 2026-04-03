@@ -9,47 +9,12 @@ import {
   useNavigate,
 } from 'react-router-dom'
 import type { Session } from '@supabase/supabase-js'
-import { isSupabaseConfigured, supabase } from './lib/supabase'
+import { isSupabaseConfigured } from './lib/supabase'
+import * as api from './lib/api'
+import type { Profile, Claim, LedgerEntry, Company } from './lib/api'
 import logoImage from './assets/logo.png'
 
 type AppRole = 'driver' | 'manager' | 'admin' | 'unknown'
-
-type Profile = {
-  id: string
-  role: Exclude<AppRole, 'unknown'>
-  full_name: string
-  company_id: string | null
-  balance: number
-}
-
-type Claim = {
-  id: string
-  claim_type: string
-  disruption_date: string
-  requested_amount: number
-  status: 'pending_review' | 'approved' | 'rejected'
-  details: string | null
-  admin_notes: string | null
-  driver_id: string
-  company_id?: string | null
-  created_at: string
-  decided_at?: string | null
-  decided_by?: string | null
-}
-
-type LedgerEntry = {
-  id: string
-  entry_type: 'credit' | 'debit' | 'adjustment'
-  amount: number
-  note: string | null
-  claim_id: string | null
-  created_at: string
-}
-
-type Company = {
-  id: string
-  name: string
-}
 
 type NavItem = {
   label: string
@@ -200,8 +165,8 @@ function LoginPage({ role }: { role: Exclude<AppRole, 'unknown'> }) {
     event.preventDefault()
     setLoading(true)
     setError('')
-    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
-    if (signInError) setError(signInError.message)
+    const result = await api.signIn(email, password)
+    if (result.error) setError(result.error)
     setLoading(false)
   }
 
@@ -276,7 +241,7 @@ function WorkspaceLayout({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   async function logout() {
-    await supabase.auth.signOut()
+    await api.signOut()
     navigate('/login')
   }
 
@@ -355,13 +320,9 @@ function DriverHome({ profile }: { profile: Profile }) {
   useEffect(() => {
     let mounted = true
     async function load() {
-      const { data } = await supabase
-        .from('claims')
-        .select('id, claim_type, disruption_date, requested_amount, status, details, admin_notes, driver_id, created_at')
-        .eq('driver_id', profile.id)
-        .order('created_at', { ascending: false })
+      const result = await api.fetchClaimsByDriver(profile.id)
       if (mounted) {
-        setClaims((data ?? []) as Claim[])
+        setClaims(result.data ?? [])
         setLoading(false)
       }
     }
@@ -371,8 +332,7 @@ function DriverHome({ profile }: { profile: Profile }) {
     }
   }, [profile.id])
 
-  const pending = claims.filter((claim) => claim.status === 'pending_review').length
-  const approved = claims.filter((claim) => claim.status === 'approved').length
+  const { pending, approved } = api.computeClaimStats(claims)
   const recent = claims.slice(0, 5)
 
   if (loading) return <LoadingState text="Loading your claim overview" />
@@ -441,18 +401,17 @@ function DriverNewClaim({ profile }: { profile: Profile }) {
       return
     }
 
-    const { error: insertError } = await supabase.from('claims').insert({
+    const result = await api.createClaim({
       driver_id: profile.id,
       company_id: profile.company_id,
       claim_type: claimType,
       disruption_date: disruptionDate,
       requested_amount: amount,
       details,
-      status: 'pending_review',
     })
 
-    if (insertError) {
-      setError(insertError.message)
+    if (result.error) {
+      setError(result.error)
       setLoading(false)
       return
     }
@@ -541,13 +500,9 @@ function DriverHistory({ profile }: { profile: Profile }) {
   useEffect(() => {
     let mounted = true
     async function load() {
-      const { data } = await supabase
-        .from('claims')
-        .select('id, claim_type, disruption_date, requested_amount, status, details, admin_notes, driver_id, created_at')
-        .eq('driver_id', profile.id)
-        .order('created_at', { ascending: false })
+      const result = await api.fetchClaimsByDriver(profile.id)
       if (mounted) {
-        setClaims((data ?? []) as Claim[])
+        setClaims(result.data ?? [])
         setLoading(false)
       }
     }
@@ -602,13 +557,9 @@ function DriverBalance({ profile }: { profile: Profile }) {
   useEffect(() => {
     let mounted = true
     async function load() {
-      const { data } = await supabase
-        .from('ledger_entries')
-        .select('id, entry_type, amount, note, claim_id, created_at')
-        .eq('profile_id', profile.id)
-        .order('created_at', { ascending: false })
+      const result = await api.fetchLedgerByProfile(profile.id)
       if (mounted) {
-        setEntries((data ?? []) as LedgerEntry[])
+        setEntries(result.data ?? [])
         setLoading(false)
       }
     }
@@ -692,24 +643,10 @@ function ManagerOverview({ profile }: { profile: Profile }) {
   useEffect(() => {
     let mounted = true
     async function load() {
-      const [{ data: claimData }, { data: driverData }] = await Promise.all([
-        supabase
-          .from('claims')
-          .select('id, claim_type, disruption_date, requested_amount, status, details, admin_notes, driver_id, company_id, created_at')
-          .eq('company_id', profile.company_id)
-          .order('created_at', { ascending: false })
-          .limit(50),
-        supabase
-          .from('profiles')
-          .select('id, role, full_name, company_id, balance')
-          .eq('company_id', profile.company_id)
-          .eq('role', 'driver')
-          .order('full_name'),
-      ])
-
+      const result = await api.fetchManagerDashboardData(profile.company_id!)
       if (mounted) {
-        setClaims((claimData ?? []) as Claim[])
-        setDrivers((driverData ?? []) as Profile[])
+        setClaims(result.claims)
+        setDrivers(result.drivers)
         setLoading(false)
       }
     }
@@ -721,9 +658,7 @@ function ManagerOverview({ profile }: { profile: Profile }) {
 
   if (loading) return <LoadingState text="Loading manager overview" />
 
-  const pending = claims.filter((claim) => claim.status === 'pending_review').length
-  const approved = claims.filter((claim) => claim.status === 'approved').length
-  const rejected = claims.filter((claim) => claim.status === 'rejected').length
+  const { pending, approved, rejected } = api.computeClaimStats(claims)
 
   return (
     <section className="flow-stack">
@@ -785,13 +720,9 @@ function ManagerClaims({ profile }: { profile: Profile }) {
   useEffect(() => {
     let mounted = true
     async function load() {
-      const { data } = await supabase
-        .from('claims')
-        .select('id, claim_type, disruption_date, requested_amount, status, details, admin_notes, driver_id, company_id, created_at')
-        .eq('company_id', profile.company_id)
-        .order('created_at', { ascending: false })
+      const result = await api.fetchClaimsByCompany(profile.company_id!)
       if (mounted) {
-        setClaims((data ?? []) as Claim[])
+        setClaims(result.data ?? [])
         setLoading(false)
       }
     }
@@ -846,14 +777,9 @@ function ManagerDrivers({ profile }: { profile: Profile }) {
   useEffect(() => {
     let mounted = true
     async function load() {
-      const { data } = await supabase
-        .from('profiles')
-        .select('id, role, full_name, company_id, balance')
-        .eq('company_id', profile.company_id)
-        .eq('role', 'driver')
-        .order('full_name')
+      const result = await api.fetchDriversByCompany(profile.company_id!)
       if (mounted) {
-        setDrivers((data ?? []) as Profile[])
+        setDrivers(result.data ?? [])
         setLoading(false)
       }
     }
@@ -900,13 +826,9 @@ function ManagerReports({ profile }: { profile: Profile }) {
   useEffect(() => {
     let mounted = true
     async function load() {
-      const { data } = await supabase
-        .from('claims')
-        .select('id, claim_type, disruption_date, requested_amount, status, details, admin_notes, driver_id, company_id, created_at')
-        .eq('company_id', profile.company_id)
-        .order('created_at', { ascending: false })
+      const result = await api.fetchClaimsByCompany(profile.company_id!)
       if (mounted) {
-        setClaims((data ?? []) as Claim[])
+        setClaims(result.data ?? [])
         setLoading(false)
       }
     }
@@ -918,8 +840,7 @@ function ManagerReports({ profile }: { profile: Profile }) {
 
   if (loading) return <LoadingState text="Loading manager reports" />
 
-  const totalRequested = claims.reduce((sum, claim) => sum + claim.requested_amount, 0)
-  const avgClaim = claims.length ? Math.round(totalRequested / claims.length) : 0
+  const { totalRequested, avgClaim } = api.computeClaimStats(claims)
 
   return (
     <section className="flow-stack">
@@ -951,18 +872,14 @@ function AdminReviewQueue({ profile }: { profile: Profile }) {
   useEffect(() => {
     let mounted = true
     async function loadClaims() {
-      const { data, error: loadError } = await supabase
-        .from('claims')
-        .select('id, claim_type, disruption_date, requested_amount, status, details, admin_notes, driver_id, company_id, created_at')
-        .eq('status', 'pending_review')
-        .order('created_at', { ascending: true })
+      const result = await api.fetchPendingClaims()
       if (!mounted) return
-      if (loadError) {
-        setError(loadError.message)
+      if (result.error) {
+        setError(result.error)
         setLoading(false)
         return
       }
-      setClaims((data ?? []) as Claim[])
+      setClaims(result.data ?? [])
       setLoading(false)
     }
 
@@ -981,18 +898,15 @@ function AdminReviewQueue({ profile }: { profile: Profile }) {
     }
 
     setSavingId(claimId)
-    const { error: updateError } = await supabase
-      .from('claims')
-      .update({
-        status: nextStatus,
-        admin_notes: note,
-        decided_by: profile.id,
-        decided_at: new Date().toISOString(),
-      })
-      .eq('id', claimId)
+    const result = await api.decideClaim({
+      claimId,
+      status: nextStatus,
+      adminNotes: note,
+      decidedBy: profile.id,
+    })
 
-    if (updateError) {
-      setError(updateError.message)
+    if (result.error) {
+      setError(result.error)
       setSavingId(null)
       return
     }
@@ -1087,16 +1001,9 @@ function AdminDecisionsLog() {
   useEffect(() => {
     let mounted = true
     async function load() {
-      const { data } = await supabase
-        .from('claims')
-        .select(
-          'id, claim_type, disruption_date, requested_amount, status, details, admin_notes, driver_id, company_id, created_at, decided_at, decided_by',
-        )
-        .neq('status', 'pending_review')
-        .order('created_at', { ascending: false })
-        .limit(100)
+      const result = await api.fetchDecidedClaims(100)
       if (mounted) {
-        setClaims((data ?? []) as Claim[])
+        setClaims(result.data ?? [])
         setLoading(false)
       }
     }
@@ -1151,13 +1058,9 @@ function AdminDrivers() {
   useEffect(() => {
     let mounted = true
     async function load() {
-      const { data } = await supabase
-        .from('profiles')
-        .select('id, role, full_name, company_id, balance')
-        .eq('role', 'driver')
-        .order('full_name')
+      const result = await api.fetchAllDrivers()
       if (mounted) {
-        setDrivers((data ?? []) as Profile[])
+        setDrivers(result.data ?? [])
         setLoading(false)
       }
     }
@@ -1206,9 +1109,9 @@ function AdminCompanies() {
   useEffect(() => {
     let mounted = true
     async function load() {
-      const { data } = await supabase.from('companies').select('id, name').order('name')
+      const result = await api.fetchAllCompanies()
       if (mounted) {
-        setCompanies((data ?? []) as Company[])
+        setCompanies(result.data ?? [])
         setLoading(false)
       }
     }
@@ -1302,9 +1205,9 @@ function RoleWorkspace({ hostRole }: { hostRole: Exclude<AppRole, 'unknown'> }) 
     let alive = true
 
     async function refreshSessionAndProfile() {
-      const { data } = await supabase.auth.getSession()
+      const { data: sessionData } = await api.getSession()
       if (!alive) return
-      const currentSession = data.session
+      const currentSession = sessionData
       setSession(currentSession)
 
       if (!currentSession) {
@@ -1313,22 +1216,18 @@ function RoleWorkspace({ hostRole }: { hostRole: Exclude<AppRole, 'unknown'> }) 
         return
       }
 
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('id, role, full_name, company_id, balance')
-        .eq('id', currentSession.user.id)
-        .single()
+      const result = await api.fetchProfile(currentSession.user.id)
 
-      if (profileError) {
-        setError(profileError.message)
+      if (result.error) {
+        setError(result.error)
         setLoading(false)
         return
       }
 
-      const typedProfile = profileData as Profile
+      const typedProfile = result.data!
       if (typedProfile.role !== hostRole) {
         setError(`Role mismatch: this subdomain is for ${hostRole} users only.`)
-        await supabase.auth.signOut()
+        await api.signOut()
         setSession(null)
         setProfile(null)
         setLoading(false)
@@ -1340,7 +1239,7 @@ function RoleWorkspace({ hostRole }: { hostRole: Exclude<AppRole, 'unknown'> }) 
     }
 
     void refreshSessionAndProfile()
-    const { data: listener } = supabase.auth.onAuthStateChange(() => {
+    const { data: listener } = api.onAuthStateChange(() => {
       void refreshSessionAndProfile()
     })
 
