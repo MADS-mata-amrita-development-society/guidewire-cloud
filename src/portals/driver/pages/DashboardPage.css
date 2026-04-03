@@ -1,0 +1,183 @@
+.driver-dashboard {
+  min-height: 100vh;
+  background: var(--aegis-white);
+}
+
+.driver-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5) var(--space-3);
+}
+
+.driver-greeting { margin-bottom: 1px; }
+
+.driver-name {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+}
+
+.driver-dashboard-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-top: 0;
+}
+
+/* Disruption Alert */
+.disruption-alert {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--aegis-warning-bg);
+  border: 1px solid var(--aegis-warning-border);
+  border-radius: var(--radius-lg);
+  color: #92400E;
+  font-size: var(--text-sm);
+}
+
+.disruption-alert > div {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.disruption-alert strong { font-size: var(--text-sm); }
+.disruption-alert span { font-size: var(--text-xs); }
+
+/* Wallet Card */
+.wallet-card {
+  background: var(--aegis-50);
+  border-color: var(--aegis-200);
+}
+
+.wallet-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+}
+
+.wallet-card-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  background: var(--aegis-white);
+  color: var(--aegis-500);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--aegis-200);
+}
+
+.wallet-label { margin-bottom: 2px; }
+
+.wallet-amount {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  color: var(--aegis-gray-900);
+  margin-bottom: 0;
+}
+
+/* Policy Card */
+.policy-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+}
+
+.policy-card-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  background: var(--aegis-success-bg);
+  color: var(--aegis-success);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.policy-title {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  margin-bottom: 2px;
+}
+
+.policy-coverage { margin-bottom: var(--space-3); }
+
+.policy-renewal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--aegis-gray-100);
+}
+
+/* File Claim CTA */
+.file-claim-cta { margin-top: var(--space-1); }
+
+/* Section Header */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--space-3);
+}
+
+.section-title {
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+}
+
+/* Claims List */
+.claims-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.claim-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+}
+
+.claim-item-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-md);
+  background: var(--aegis-50);
+  color: var(--aegis-500);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.claim-item-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.claim-item-type {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--aegis-gray-900);
+}
+
+.claim-item-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+}
+
+.claim-item-amount {
+  font-size: var(--text-sm);
+  color: var(--aegis-gray-900);
+}

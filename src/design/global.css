@@ -1,0 +1,112 @@
+/* ============================================
+   AEGIS DESIGN SYSTEM — GLOBAL STYLES
+   ============================================ */
+
+@import './tokens.css';
+@import './animations.css';
+@import './components.css';
+
+/* ── Reset ── */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--font-primary);
+  font-weight: var(--weight-regular);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  color: var(--aegis-gray-700);
+  background-color: var(--aegis-white);
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* ── Typography ── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-primary);
+  font-weight: var(--weight-semibold);
+  color: var(--aegis-gray-900);
+  line-height: var(--leading-tight);
+}
+
+h1 { font-size: var(--text-3xl); }
+h2 { font-size: var(--text-2xl); }
+h3 { font-size: var(--text-xl); }
+h4 { font-size: var(--text-lg); }
+
+p {
+  margin-bottom: var(--space-3);
+  color: var(--aegis-gray-500);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+}
+
+a {
+  color: var(--aegis-600);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+a:hover { color: var(--aegis-700); }
+
+ul, ol { list-style: none; }
+img, svg { display: block; max-width: 100%; }
+
+button {
+  font-family: var(--font-primary);
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+input, textarea, select {
+  font-family: var(--font-primary);
+  font-size: var(--text-sm);
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--aegis-gray-300); border-radius: var(--radius-full); }
+::-webkit-scrollbar-thumb:hover { background: var(--aegis-gray-400); }
+
+/* ── Utility ── */
+.text-center  { text-align: center; }
+.text-right   { text-align: right; }
+.font-serif   { font-family: var(--font-serif); }
+.font-medium  { font-weight: var(--weight-medium); }
+.font-semibold { font-weight: var(--weight-semibold); }
+.font-bold    { font-weight: var(--weight-bold); }
+.text-xs  { font-size: var(--text-xs); }
+.text-sm  { font-size: var(--text-sm); }
+.text-base { font-size: var(--text-base); }
+.text-lg  { font-size: var(--text-lg); }
+.text-xl  { font-size: var(--text-xl); }
+.text-muted   { color: var(--aegis-gray-500); }
+.text-primary { color: var(--aegis-500); }
+.text-success { color: var(--aegis-success); }
+.text-warning { color: var(--aegis-warning); }
+.text-danger  { color: var(--aegis-danger); }
+.text-dark    { color: var(--aegis-gray-900); }
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+::selection {
+  background-color: var(--aegis-200);
+  color: var(--aegis-900);
+}

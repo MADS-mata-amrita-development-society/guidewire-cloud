@@ -1,0 +1,30 @@
+.claim-review-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.claim-review-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.claim-review-driver {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background: var(--aegis-gray-50);
+  border-radius: var(--radius-md);
+}
+
+.claim-review-details { padding-top: var(--space-1); }
+
+.claim-review-footer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--aegis-gray-100);
+}

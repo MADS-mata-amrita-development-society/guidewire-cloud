@@ -1,0 +1,176 @@
+/* ── Claim History ── */
+.claim-history-item { cursor: pointer; }
+
+.claim-history-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.claim-expanded {
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--aegis-gray-100);
+}
+
+.claim-description {
+  font-size: var(--text-sm);
+  color: var(--aegis-gray-600);
+  line-height: var(--leading-relaxed);
+}
+
+.claim-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--space-2);
+}
+
+.claim-rejection {
+  margin-top: var(--space-2);
+  padding: var(--space-3);
+  background: var(--aegis-danger-bg);
+  border-radius: var(--radius-md);
+}
+
+.claim-rejection p { margin-top: 2px; margin-bottom: 0; }
+
+/* ── Wallet ── */
+.wallet-balance-card {
+  background: linear-gradient(180deg, #8DBDFF, #6AA1F5);
+  color: var(--aegis-white);
+  text-align: center;
+  padding: var(--space-6);
+  border-color: transparent;
+}
+
+.wallet-balance-card .text-muted { color: rgba(255, 255, 255, 0.7) !important; }
+
+.wallet-balance-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--space-2);
+}
+
+.wallet-balance-amount {
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-bold);
+  margin-bottom: 0;
+}
+
+.transactions-list {
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--space-3);
+}
+
+.transaction-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--aegis-gray-100);
+}
+
+.transaction-item:last-child { border-bottom: none; }
+
+.transaction-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.transaction-icon.credit { background: var(--aegis-success-bg); color: var(--aegis-success); }
+.transaction-icon.debit  { background: var(--aegis-danger-bg); color: var(--aegis-danger); }
+
+.transaction-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.transaction-desc {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--aegis-gray-800);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.transaction-amount { font-size: var(--text-sm); white-space: nowrap; }
+.transaction-amount.credit { color: var(--aegis-success); }
+.transaction-amount.debit  { color: var(--aegis-danger); }
+
+/* ── Profile ── */
+.profile-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: var(--space-5);
+}
+
+.profile-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #8DBDFF, #6AA1F5);
+  color: var(--aegis-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  margin-bottom: var(--space-2);
+}
+
+.profile-name {
+  font-size: var(--text-lg);
+  margin-bottom: var(--space-1);
+}
+
+.profile-info-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-info-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--aegis-gray-100);
+}
+
+.profile-info-row:first-child { padding-top: 0; }
+.profile-info-row:last-child  { border-bottom: none; padding-bottom: 0; }
+
+.profile-info-row > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-info-value {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--aegis-gray-900);
+}
+
+.profile-stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--aegis-gray-100);
+}

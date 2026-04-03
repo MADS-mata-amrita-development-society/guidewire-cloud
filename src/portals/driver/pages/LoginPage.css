@@ -1,0 +1,64 @@
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  background: var(--aegis-gray-50);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 380px;
+  background: var(--aegis-white);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-8) var(--space-6);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--aegis-gray-200);
+  animation: fadeIn var(--transition-slow) ease;
+}
+
+.login-brand {
+  text-align: center;
+  margin-bottom: var(--space-6);
+}
+
+.login-logo {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, #8DBDFF, #6AA1F5);
+  color: var(--aegis-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--space-3);
+  box-shadow: var(--shadow-btn);
+}
+
+.login-title {
+  font-size: var(--text-2xl);
+  color: var(--aegis-gray-900);
+  margin-bottom: 2px;
+}
+
+.login-subtitle {
+  font-size: var(--text-sm);
+  color: var(--aegis-gray-500);
+  font-weight: var(--weight-medium);
+  margin-bottom: 0;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.login-footer-text {
+  text-align: center;
+  font-size: var(--text-xs);
+  color: var(--aegis-gray-400);
+  margin-top: var(--space-5);
+  margin-bottom: 0;
+}

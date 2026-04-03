@@ -1,0 +1,139 @@
+.file-claim-page {
+  min-height: 100vh;
+  background: var(--aegis-white);
+}
+
+.file-claim-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+}
+
+.file-claim-header h1 { font-size: var(--text-base); flex: 1; }
+.step-indicator { white-space: nowrap; }
+
+.step-progress {
+  height: 2px;
+  background: var(--aegis-gray-100);
+}
+
+.step-progress-bar {
+  height: 100%;
+  background: var(--aegis-500);
+  transition: width var(--transition-slow);
+}
+
+.file-claim-content { padding-top: var(--space-4); }
+
+.step-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.step-title { font-size: var(--text-lg); }
+.step-description { margin-top: -8px; margin-bottom: 0; }
+
+.claim-type-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.claim-type-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--space-5);
+  border: 1.5px solid var(--aegis-gray-200);
+  transition: all var(--transition-fast);
+}
+
+.claim-type-card.selected {
+  border-color: var(--aegis-500);
+  background: var(--aegis-50);
+}
+
+.claim-type-card h3 {
+  font-size: var(--text-sm);
+  margin-top: var(--space-2);
+  margin-bottom: 2px;
+}
+
+.claim-type-card p { margin-bottom: 0; }
+
+.claim-type-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.claim-type-icon.disaster { background: var(--aegis-100); color: var(--aegis-600); }
+.claim-type-icon.strike   { background: var(--aegis-warning-bg); color: var(--aegis-warning); }
+
+.claim-form { display: flex; flex-direction: column; gap: var(--space-4); }
+
+.review-card { background: var(--aegis-gray-50); }
+
+.review-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--aegis-gray-200);
+}
+
+.review-row:last-child { border-bottom: none; }
+
+.review-label {
+  font-size: var(--text-sm);
+  color: var(--aegis-gray-500);
+  font-weight: var(--weight-medium);
+  flex-shrink: 0;
+  margin-right: var(--space-4);
+}
+
+.review-value {
+  font-size: var(--text-sm);
+  color: var(--aegis-gray-900);
+  font-weight: var(--weight-medium);
+  text-align: right;
+}
+
+.step-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-6);
+  padding-bottom: var(--space-6);
+}
+
+.claim-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 50vh;
+  gap: var(--space-3);
+  animation: fadeIn var(--transition-slow) ease;
+}
+
+.claim-success-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--aegis-success-bg);
+  color: var(--aegis-success);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.claim-success h2 { font-size: var(--text-xl); }
+.claim-success p { max-width: 300px; }
