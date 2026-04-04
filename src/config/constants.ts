@@ -53,3 +53,15 @@ export function formatCurrencyFull(amount: number): string {
     maximumFractionDigits: 2,
   })}`;
 }
+
+export function getTierCoveragePercent(tier: string): number {
+  if (tier === 'premium') return 100;
+  if (tier === 'standard') return 75;
+  return 50;
+}
+
+export function estimateMaxClaimAmount(avgWeeklyEarnings: number, tier: string): number {
+  const coverage = getTierCoveragePercent(tier) / 100;
+  const baseline = avgWeeklyEarnings > 0 ? avgWeeklyEarnings : 3000;
+  return Math.max(Math.round(baseline * coverage), 500);
+}

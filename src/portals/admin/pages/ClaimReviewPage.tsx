@@ -132,6 +132,14 @@ export function ClaimReviewPage() {
                   <span className="text-sm font-medium">{claim.claim_type === 'natural_disaster' ? 'Natural Disaster' : 'Strike / Curfew'}</span>
                 </div>
                 {claim.description && <p className="text-sm" style={{ color: 'var(--aegis-gray-600)', margin: 0 }}>{claim.description}</p>}
+                {claim.ai_evaluation && (
+                  <div style={{ marginTop: 'var(--space-2)', border: '1px solid var(--aegis-border)', borderRadius: 'var(--radius-md)', padding: 'var(--space-2)', background: 'var(--aegis-gray-50)' }}>
+                    <div className="text-xs" style={{ fontWeight: 700, marginBottom: '4px', color: 'var(--aegis-gray-700)' }}>
+                      AI suggestion: {claim.ai_evaluation.suggested_decision.toUpperCase()} | confidence {Math.round(claim.ai_evaluation.confidence * 100)}% | risk {Math.round(claim.ai_evaluation.risk_score * 100)}%
+                    </div>
+                    <p className="text-xs text-muted" style={{ margin: 0 }}>{claim.ai_evaluation.rationale}</p>
+                  </div>
+                )}
               </div>
 
               <div className="claim-review-footer">

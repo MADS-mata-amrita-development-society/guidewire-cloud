@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/services/auth.tsx';
-import { fileClaim } from '@/services/api.ts';
+import { fetchDriverProfile, fileClaim } from '@/services/api.ts';
 import { Card } from '@/components/Card/Card.tsx';
 import { Button } from '@/components/Button/Button.tsx';
 import { Input, Textarea } from '@/components/Input/Input.tsx';
 import { CloudRain, Megaphone, ArrowLeft, Check, MapPin, CalendarBlank } from '@phosphor-icons/react';
-import { formatCurrency } from '@/config/constants.ts';
+import { estimateMaxClaimAmount, formatCurrency } from '@/config/constants.ts';
+import type { DriverProfile } from '@/types/index.ts';
 import './FileClaimPage.css';
 
 type ClaimType = 'natural_disaster' | 'strike_curfew' | null;
@@ -23,8 +24,20 @@ export function FileClaimPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
+  const [driverProfile, setDriverProfile] = useState<DriverProfile | null>(null);
 
   const totalSteps = 3;
+
+  useEffect(() => {
+    if (!user) return;
+    const loadProfile = async () => {
+      const { data } = await fetchDriverProfile(user.id);
+      setDriverProfile((data as DriverProfile | null) ?? null);
+    };
+    void loadProfile();
+  }, [user]);
+
+  const estimatedCap = estimateMaxClaimAmount(driverProfile?.avg_weekly_earnings || 0, driverProfile?.tier || 'basic');
 
   const canContinue = () => {
     if (step === 1) return !!claimType;
@@ -146,6 +159,7 @@ export function FileClaimPage() {
               <Input label="Date of Disruption" type="date" value={date} onChange={e => setDate(e.target.value)} icon={<CalendarBlank size={16} />} required />
               <Input label="Location" placeholder="e.g., Koramangala, Bangalore" value={location} onChange={e => setLocation(e.target.value)} icon={<MapPin size={16} />} required />
               <Input label="Claim Amount (₹)" type="number" placeholder="Enter amount" value={amount} onChange={e => setAmount(e.target.value)} required helper="Based on your missed earnings" />
+              <p className="text-xs text-muted">Your current estimated cap is {formatCurrency(estimatedCap)} based on tier and earnings. Requests above cap may be auto-reduced or rejected.</p>
               <Textarea label="Description" placeholder="Describe what happened..." value={description} onChange={e => setDescription(e.target.value)} rows={3} />
             </div>
           </div>
