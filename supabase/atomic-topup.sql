@@ -12,12 +12,20 @@ CREATE OR REPLACE FUNCTION public.atomic_wallet_topup(
 RETURNS jsonb
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public, auth
 AS $$
 DECLARE
   v_wallet_id uuid;
   v_new_balance numeric;
 BEGIN
+  -- Authorization: only admins may top up wallets
+  IF NOT EXISTS (
+    SELECT 1 FROM public.users u
+    WHERE u.id = auth.uid() AND u.role = 'admin'
+  ) THEN
+    RETURN jsonb_build_object('error', 'Unauthorized');
+  END IF;
+
   -- Validate amount
   IF p_amount <= 0 THEN
     RETURN jsonb_build_object('error', 'Amount must be positive');
