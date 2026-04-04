@@ -335,17 +335,22 @@
   align-items: center;
   gap: var(--space-3);
   border-bottom: 1px solid var(--aegis-gray-100);
-  height: var(--topbar-height);
+  min-height: var(--topbar-height);
+}
+
+.sidebar-logo-image {
+  width: 92px;
+  height: 32px;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 
 .sidebar-brand {
   font-family: var(--font-serif);
-  font-size: var(--text-lg);
+  font-size: var(--text-2xl);
   font-weight: var(--weight-bold);
   color: var(--aegis-gray-900);
 }
-
-.sidebar-brand span { color: var(--aegis-500); }
 
 .sidebar-nav {
   flex: 1;
@@ -418,7 +423,7 @@
   position: sticky;
   top: 0;
   height: var(--topbar-height);
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(248, 243, 232, 0.92);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--aegis-gray-100);

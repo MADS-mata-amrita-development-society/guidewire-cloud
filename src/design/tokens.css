@@ -18,18 +18,18 @@
   --aegis-900: #1E3A8A;
   --aegis-acc: var(--aegis-500);
 
-  /* ── Neutrals (Clean, crisp grays) ── */
-  --aegis-white:    #FFFFFF;
-  --aegis-gray-50:  #F8FAFC;
-  --aegis-gray-100: #F1F5F9;
-  --aegis-gray-200: #E2E8F0;
-  --aegis-gray-300: #CBD5E1;
-  --aegis-gray-400: #94A3B8;
-  --aegis-gray-500: #64748B;
-  --aegis-gray-600: #475569;
-  --aegis-gray-700: #334155;
-  --aegis-gray-800: #1E293B;
-  --aegis-gray-900: #0F172A;
+  /* ── Neutrals (Cream-forward to match brand artwork) ── */
+  --aegis-white:    #F8F3E8;
+  --aegis-gray-50:  #F3ECE0;
+  --aegis-gray-100: #E7DECF;
+  --aegis-gray-200: #D8CEBE;
+  --aegis-gray-300: #C7BDAC;
+  --aegis-gray-400: #9F9585;
+  --aegis-gray-500: #776E61;
+  --aegis-gray-600: #5E554A;
+  --aegis-gray-700: #433C34;
+  --aegis-gray-800: #2E2924;
+  --aegis-gray-900: #1D1A17;
 
   /* ── Semantic Colors ── */
   --aegis-success:        #10B981;
@@ -109,4 +109,18 @@
   --topbar-height: 60px;
   --bottomnav-height: 60px;
   --content-max-width: 1200px;
+}
+
+html[data-theme='dark'] {
+  --aegis-white:    #11161D;
+  --aegis-gray-50:  #181F28;
+  --aegis-gray-100: #232D39;
+  --aegis-gray-200: #2D3847;
+  --aegis-gray-300: #3A4758;
+  --aegis-gray-400: #59687C;
+  --aegis-gray-500: #8D9BB0;
+  --aegis-gray-600: #B3C0D2;
+  --aegis-gray-700: #CED7E4;
+  --aegis-gray-800: #E1E8F2;
+  --aegis-gray-900: #F1F6FC;
 }

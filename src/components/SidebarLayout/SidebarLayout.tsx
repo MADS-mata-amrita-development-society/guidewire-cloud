@@ -1,6 +1,7 @@
+import { useEffect, useState } from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
 import { useAuth } from '@/services/auth.tsx';
-import { Shield, SignOut } from '@phosphor-icons/react';
+import { Moon, SignOut, Sun } from '@phosphor-icons/react';
 import type { Icon as PhosphorIconType } from '@phosphor-icons/react';
 
 export interface SidebarNavItem {
@@ -24,20 +25,26 @@ export function SidebarLayout({
   layoutClassName = 'admin-layout',
 }: SidebarLayoutProps) {
   const { profile, signOut } = useAuth();
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    const storedTheme = localStorage.getItem('aegis-theme');
+    const shouldUseDark = storedTheme === 'dark';
+    setIsDarkMode(shouldUseDark);
+    document.documentElement.dataset.theme = shouldUseDark ? 'dark' : 'light';
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = isDarkMode ? 'dark' : 'light';
+    localStorage.setItem('aegis-theme', isDarkMode ? 'dark' : 'light');
+  }, [isDarkMode]);
 
   return (
     <div className={layoutClassName}>
       <aside className="sidebar">
         <div className="sidebar-header">
-          <div style={{
-            width: 32, height: 32, borderRadius: 'var(--radius-md)',
-            background: 'linear-gradient(180deg, #8DBDFF, #6AA1F5)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: 'white',
-          }}>
-            <Shield size={16} />
-          </div>
-          <div className="sidebar-brand"><span>Aegis</span> {portalName}</div>
+          <img className="sidebar-logo-image" src="/pictures/aegis%20logo.png" alt="Aegis" />
+          <div className="sidebar-brand">{portalName}</div>
         </div>
 
         <nav className="sidebar-nav">
@@ -56,6 +63,10 @@ export function SidebarLayout({
         </nav>
 
         <div className="sidebar-footer">
+          <button className="sidebar-link" style={{ width: '100%', marginBottom: '4px' }} onClick={() => setIsDarkMode(prev => !prev)}>
+            {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}
+            {isDarkMode ? 'Light Mode' : 'Dark Mode'}
+          </button>
           <div style={{ padding: '8px 12px', marginBottom: '4px' }}>
             <div className="text-sm font-semibold" style={{ color: 'var(--aegis-gray-900)' }}>{profile?.full_name}</div>
             <div className="text-xs text-muted">{profile?.email}</div>
