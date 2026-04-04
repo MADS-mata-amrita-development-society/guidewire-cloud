@@ -264,6 +264,13 @@ drop policy if exists "Users see own wallet" on public.wallets;
 create policy "Users see own wallet" on public.wallets
   for select using (user_id = auth.uid());
 
+drop policy if exists "Managers see company drivers wallets" on public.wallets;
+create policy "Managers see company drivers wallets" on public.wallets
+  for select using (
+    public.is_manager()
+    and public.get_profile_company(user_id) = public.get_user_company()
+  );
+
 -- WALLET TRANSACTIONS
 drop policy if exists "Admins full access to wallet_transactions" on public.wallet_transactions;
 create policy "Admins full access to wallet_transactions" on public.wallet_transactions
