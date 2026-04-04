@@ -6,6 +6,9 @@
 2. Open **SQL Editor**.
 3. Run `supabase/schema.sql`.
 
+If you want Admin wallet top-ups to work (RPC used by the Admin Portal), also run:
+`supabase/atomic-topup.sql`
+
 If you already ran an older schema version and see:
 `infinite recursion detected in policy for relation "users"`
 run `supabase/hotfix-rls-recursion.sql` once.
