@@ -2,6 +2,7 @@ const CACHE_NAME = 'aegis-v1';
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',
+  '/favicon.svg',
 ];
 
 self.addEventListener('install', (event) => {
@@ -21,21 +22,25 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Network-first for API calls
-  if (event.request.url.includes('supabase')) {
+  // Skip non-GET requests entirely
+  if (event.request.method !== 'GET') return;
+
+  // Never cache API calls or auth-related requests
+  const url = new URL(event.request.url);
+  if (
+    url.hostname.includes('supabase') ||
+    url.pathname.startsWith('/auth') ||
+    url.pathname.startsWith('/rest') ||
+    url.searchParams.has('token')
+  ) {
     return;
   }
 
-  // Cache-first for static assets
+  // Only serve from cache for explicit static assets; don't cache-on-the-fly.
+  // This prevents caching auth-sensitive rendered pages on shared devices.
   event.respondWith(
     caches.match(event.request).then((cached) => {
-      return cached || fetch(event.request).then((response) => {
-        if (response.status === 200 && event.request.method === 'GET') {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
-        }
-        return response;
-      });
+      return cached || fetch(event.request);
     }).catch(() => caches.match('/'))
   );
 });

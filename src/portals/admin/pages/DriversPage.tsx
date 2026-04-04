@@ -3,25 +3,27 @@ import { useAuth } from '@/services/auth.tsx';
 import { fetchDrivers } from '@/services/api.ts';
 import { TierBadge } from '@/components/Badge/Badge.tsx';
 import { Input } from '@/components/Input/Input.tsx';
+import { LoadingSpinner } from '@/components/LoadingSpinner/LoadingSpinner.tsx';
 import { formatCurrency } from '@/config/constants.ts';
-import { MagnifyingGlass , House } from '@phosphor-icons/react';
+import { MagnifyingGlass } from '@phosphor-icons/react';
+import type { DriverWithProfile } from '@/types/index.ts';
 
 export function DriversPage() {
   const { user } = useAuth();
-  const [drivers, setDrivers] = useState<any[]>([]);
+  const [drivers, setDrivers] = useState<DriverWithProfile[]>([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!user) return;
     fetchDrivers().then(({ data }) => {
-      setDrivers(data || []);
+      setDrivers((data || []) as DriverWithProfile[]);
       setLoading(false);
     });
   }, [user]);
 
   if (loading) {
-    return <div className="loading-screen"><div className="spinner spinner-lg" /></div>;
+    return <LoadingSpinner fullScreen size="lg" />;
   }
 
   const filtered = drivers.filter(d =>
@@ -48,7 +50,7 @@ export function DriversPage() {
             <tr><th>Driver</th><th>Email</th><th>Zone</th><th>Tier</th><th>Balance</th></tr>
           </thead>
           <tbody>
-            {filtered.map((d: any) => (
+            {filtered.map((d) => (
               <tr key={d.id}>
                 <td>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
@@ -61,7 +63,7 @@ export function DriversPage() {
                 <td className="text-muted">{d.email}</td>
                 <td>{d.driver_profile?.zone || '—'}</td>
                 <td>{d.driver_profile?.tier ? <TierBadge tier={d.driver_profile.tier} /> : '—'}</td>
-                <td className="font-serif">{formatCurrency(d.wallet?.[0]?.balance ?? 0)}</td>
+                <td className="font-serif">{formatCurrency(d.wallet?.balance ?? 0)}</td>
               </tr>
             ))}
           </tbody>

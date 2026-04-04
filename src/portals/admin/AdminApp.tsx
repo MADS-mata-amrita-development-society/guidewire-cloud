@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from '@/services/auth.tsx';
+import { ErrorBoundary } from '@/components/ErrorBoundary/ErrorBoundary.tsx';
+import { ToastProvider } from '@/components/Toast/ToastProvider.tsx';
 import { AdminLayout } from './layouts/AdminLayout.tsx';
 import { LoginPage } from './pages/LoginPage.tsx';
 import { DashboardPage } from './pages/DashboardPage.tsx';
@@ -17,6 +19,10 @@ function AppRoutes() {
 
   if (!user || !profile) {
     return <Routes><Route path="/login" element={<LoginPage />} /><Route path="*" element={<Navigate to="/login" replace />} /></Routes>;
+  }
+
+  if (profile.role !== 'admin') {
+    return <div className="loading-screen"><p className="loading-screen-text">Access denied. This portal is for administrators only.</p></div>;
   }
 
   return (
@@ -37,9 +43,13 @@ function AppRoutes() {
 export function AdminApp() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
+      <ToastProvider>
+        <ErrorBoundary>
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
+        </ErrorBoundary>
+      </ToastProvider>
     </AuthProvider>
   );
 }

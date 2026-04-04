@@ -1,5 +1,5 @@
 import { Card } from '@/components/Card/Card.tsx';
-import { Gear as SettingsIcon, Shield, Warning , Buildings , SignOut , CalendarBlank , CaretRight , MagnifyingGlass , House } from '@phosphor-icons/react';
+import { Gear as SettingsIcon, Shield, Warning } from '@phosphor-icons/react';
 
 export function SettingsPage() {
   return (
@@ -29,10 +29,7 @@ export function SettingsPage() {
                 borderRadius: 'var(--radius-md)',
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                  <div style={{
-                    width: 8, height: 8, borderRadius: '50%',
-                    background: t.color,
-                  }} />
+                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: t.color }} />
                   <span className="font-semibold text-sm">{t.tier} Tier</span>
                 </div>
                 <span className="text-sm text-muted">Coverage: {t.coverage}</span>

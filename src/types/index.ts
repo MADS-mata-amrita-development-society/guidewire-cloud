@@ -88,6 +88,8 @@ export interface Claim {
   reviewed_by: string | null;
   filed_at: string;
   reviewed_at: string | null;
+  location_text: string | null;
+  event_date: string | null;
   evidence: ClaimEvidence | null;
   metadata: Record<string, unknown> | null;
 }

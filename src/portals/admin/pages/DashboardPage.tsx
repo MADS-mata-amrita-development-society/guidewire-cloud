@@ -5,15 +5,18 @@ import { fetchAdminStats, fetchAllClaims } from '@/services/api.ts';
 import { StatCard } from '@/components/StatCard/StatCard.tsx';
 import { Card } from '@/components/Card/Card.tsx';
 import { StatusBadge } from '@/components/Badge/Badge.tsx';
+import { LoadingSpinner } from '@/components/LoadingSpinner/LoadingSpinner.tsx';
 import { formatCurrency } from '@/config/constants.ts';
-import { Buildings, Users, MagnifyingGlass, Wallet, Warning, CaretRight , SignOut , CalendarBlank , House } from '@phosphor-icons/react';
+import { Buildings, Users, MagnifyingGlass, Wallet, Warning, CaretRight } from '@phosphor-icons/react';
+import type { ClaimWithDriver } from '@/types/index.ts';
 
 export function DashboardPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [stats, setStats] = useState({ companies: 0, drivers: 0, pendingClaims: 0, totalPayouts: 0 });
-  const [recentClaims, setRecentClaims] = useState<any[]>([]);
+  const [recentClaims, setRecentClaims] = useState<ClaimWithDriver[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -24,9 +27,10 @@ export function DashboardPage() {
           fetchAllClaims(),
         ]);
         setStats(s);
-        setRecentClaims((c.data || []).slice(0, 5));
+        setRecentClaims((c.data || []).slice(0, 5) as ClaimWithDriver[]);
       } catch (e) {
         console.error('[AdminDashboard] Error:', e);
+        setError('Failed to load dashboard data.');
       } finally {
         setLoading(false);
       }
@@ -35,7 +39,11 @@ export function DashboardPage() {
   }, [user]);
 
   if (loading) {
-    return <div className="loading-screen"><div className="spinner spinner-lg" /></div>;
+    return <LoadingSpinner fullScreen size="lg" />;
+  }
+
+  if (error) {
+    return <div className="page-content"><p className="text-sm text-muted">{error}</p></div>;
   }
 
   return (
@@ -76,7 +84,7 @@ export function DashboardPage() {
                 <tr><th>Driver</th><th>Type</th><th>Amount</th><th>Status</th><th>Filed</th></tr>
               </thead>
               <tbody>
-                {recentClaims.map((c: any) => (
+                {recentClaims.map((c) => (
                   <tr key={c.id}>
                     <td className="font-medium">{c.driver?.full_name || '—'}</td>
                     <td>{c.claim_type === 'natural_disaster' ? 'Natural Disaster' : 'Strike'}</td>

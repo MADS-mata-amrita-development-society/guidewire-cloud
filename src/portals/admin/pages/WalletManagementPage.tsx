@@ -6,13 +6,24 @@ import { Card } from '@/components/Card/Card.tsx';
 import { Button } from '@/components/Button/Button.tsx';
 import { Input, Select } from '@/components/Input/Input.tsx';
 import { Modal } from '@/components/Modal/Modal.tsx';
+import { LoadingSpinner } from '@/components/LoadingSpinner/LoadingSpinner.tsx';
+import { useToast } from '@/components/Toast/ToastProvider.tsx';
 import { formatCurrency } from '@/config/constants.ts';
-import { Plus, MagnifyingGlass } from '@phosphor-icons/react';
+import { Plus } from '@phosphor-icons/react';
+import type { DriverWithProfile, WalletTransaction } from '@/types/index.ts';
+
+interface TransactionWithUser extends WalletTransaction {
+  wallet?: {
+    user_id: string;
+    user?: { full_name: string };
+  };
+}
 
 export function WalletManagementPage() {
   const { user } = useAuth();
-  const [transactions, setTransactions] = useState<any[]>([]);
-  const [drivers, setDrivers] = useState<any[]>([]);
+  const toast = useToast();
+  const [transactions, setTransactions] = useState<TransactionWithUser[]>([]);
+  const [drivers, setDrivers] = useState<DriverWithProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [showTopUp, setShowTopUp] = useState(false);
   const [topUpDriverId, setTopUpDriverId] = useState('');
@@ -21,13 +32,18 @@ export function WalletManagementPage() {
   const [processing, setProcessing] = useState(false);
 
   const loadData = async () => {
-    const [txRes, driverRes] = await Promise.all([
-      supabase.from('wallet_transactions').select('*, wallet:wallets(user_id, user:users(full_name))').order('created_at', { ascending: false }).limit(50),
-      fetchDrivers(),
-    ]);
-    setTransactions(txRes.data || []);
-    setDrivers(driverRes.data || []);
-    setLoading(false);
+    try {
+      const [txRes, driverRes] = await Promise.all([
+        supabase.from('wallet_transactions').select('*, wallet:wallets(user_id, user:users(full_name))').order('created_at', { ascending: false }).limit(50),
+        fetchDrivers(),
+      ]);
+      setTransactions((txRes.data || []) as TransactionWithUser[]);
+      setDrivers((driverRes.data || []) as DriverWithProfile[]);
+    } catch (e) {
+      console.error('[WalletManagement] Error loading data:', e);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -37,22 +53,31 @@ export function WalletManagementPage() {
 
   const handleTopUp = async () => {
     if (!topUpDriverId || !topUpAmount) return;
+    const amount = Number(topUpAmount);
+    if (amount <= 0 || !Number.isFinite(amount)) {
+      toast.error('Amount must be a positive number.');
+      return;
+    }
     setProcessing(true);
-    await adminTopUpWallet(topUpDriverId, Number(topUpAmount), topUpNote || 'Admin top-up');
+    const { error } = await adminTopUpWallet(topUpDriverId, amount, topUpNote || 'Admin top-up');
     setProcessing(false);
-    setShowTopUp(false);
-    setTopUpDriverId('');
-    setTopUpAmount('');
-    setTopUpNote('');
-    loadData();
+    if (error) {
+      toast.error(`Top-up failed: ${typeof error === 'object' && 'message' in error ? error.message : 'Unknown error'}`);
+    } else {
+      toast.success(`${formatCurrency(amount)} credited successfully.`);
+      setShowTopUp(false);
+      setTopUpDriverId('');
+      setTopUpAmount('');
+      setTopUpNote('');
+      loadData();
+    }
   };
 
   if (loading) {
-    return <div className="loading-screen"><div className="spinner spinner-lg" /></div>;
+    return <LoadingSpinner fullScreen size="lg" />;
   }
 
-  // Compute pool totals
-  const totalBalance = drivers.reduce((sum, d) => sum + (d.wallet?.[0]?.balance ?? 0), 0);
+  const totalBalance = drivers.reduce((sum, d) => sum + (d.wallet?.balance ?? 0), 0);
 
   return (
     <div className="page-content">
@@ -78,7 +103,7 @@ export function WalletManagementPage() {
             <tr><th>Type</th><th>Driver</th><th>Description</th><th>Amount</th><th>Date</th></tr>
           </thead>
           <tbody>
-            {transactions.map((tx: any) => (
+            {transactions.map((tx) => (
               <tr key={tx.id}>
                 <td>
                   <span className={`badge ${tx.type === 'credit' ? 'badge-success' : 'badge-danger'} badge-dot`}>
@@ -98,10 +123,10 @@ export function WalletManagementPage() {
       </div>
 
       <Modal isOpen={showTopUp} onClose={() => setShowTopUp(false)} title="Top Up Wallet"
-        footer={<><Button variant="secondary" onClick={() => setShowTopUp(false)}>Cancel</Button><Button onClick={handleTopUp} loading={processing} icon={<Plus size={12} />}>Confirm</Button></>}>
+        footer={<><Button variant="secondary" onClick={() => setShowTopUp(false)}>Cancel</Button><Button onClick={handleTopUp} loading={processing} disabled={!topUpDriverId || !(Number(topUpAmount) > 0)} icon={<Plus size={12} />}>Confirm</Button></>}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
           <Select label="Driver" value={topUpDriverId} onChange={e => setTopUpDriverId(e.target.value)}
-            options={[{ value: '', label: 'Select a driver...' }, ...drivers.map((d: any) => ({ value: d.id, label: d.full_name }))]} />
+            options={[{ value: '', label: 'Select a driver...' }, ...drivers.map((d) => ({ value: d.id, label: d.full_name }))]} />
           <Input label="Amount (₹)" type="number" placeholder="Amount to credit" value={topUpAmount} onChange={e => setTopUpAmount(e.target.value)} />
           <Input label="Note (optional)" placeholder="Reason for top-up" value={topUpNote} onChange={e => setTopUpNote(e.target.value)} />
         </div>

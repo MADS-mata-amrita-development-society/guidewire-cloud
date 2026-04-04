@@ -5,13 +5,16 @@ import { Card } from '@/components/Card/Card.tsx';
 import { Button } from '@/components/Button/Button.tsx';
 import { Select } from '@/components/Input/Input.tsx';
 import { TierBadge } from '@/components/Badge/Badge.tsx';
+import { LoadingSpinner } from '@/components/LoadingSpinner/LoadingSpinner.tsx';
+import { useToast } from '@/components/Toast/ToastProvider.tsx';
 import { formatCurrency } from '@/config/constants.ts';
-import { Envelope, Phone, MapPin, Buildings, Shield, FloppyDisk, SignOut , CalendarBlank , CaretRight , MagnifyingGlass , House } from '@phosphor-icons/react';
-import type { InsuranceTier } from '@/types/index.ts';
+import { Envelope, Phone, MapPin, Shield, FloppyDisk, SignOut } from '@phosphor-icons/react';
+import type { InsuranceTier, DriverProfile as DriverProfileType } from '@/types/index.ts';
 
 export function ProfilePage() {
   const { profile, user, signOut, refreshProfile } = useAuth();
-  const [driverProfile, setDriverProfile] = useState<any>(null);
+  const toast = useToast();
+  const [driverProfile, setDriverProfile] = useState<DriverProfileType | null>(null);
   const [balance, setBalance] = useState(0);
   const [tier, setTier] = useState<InsuranceTier>('basic');
   const [originalTier, setOriginalTier] = useState<InsuranceTier>('basic');
@@ -27,8 +30,8 @@ export function ProfilePage() {
       ]);
       if (dp.data) {
         setDriverProfile(dp.data);
-        setTier(dp.data.tier);
-        setOriginalTier(dp.data.tier);
+        setTier(dp.data.tier as InsuranceTier);
+        setOriginalTier(dp.data.tier as InsuranceTier);
       }
       setBalance(w.data?.balance ?? 0);
       setLoading(false);
@@ -41,14 +44,17 @@ export function ProfilePage() {
     setSaving(true);
     const { error } = await updateDriverTier(user.id, tier);
     setSaving(false);
-    if (!error) {
+    if (error) {
+      toast.error('Failed to update tier. Please try again.');
+    } else {
       setOriginalTier(tier);
+      toast.success('Insurance tier updated successfully.');
       await refreshProfile();
     }
   };
 
   if (loading) {
-    return <div className="loading-screen"><div className="spinner spinner-lg" /></div>;
+    return <LoadingSpinner fullScreen size="lg" />;
   }
 
   return (
@@ -116,7 +122,7 @@ export function ProfilePage() {
             <span className="text-sm text-muted">Wallet Balance</span>
             <span className="font-serif font-bold">{formatCurrency(balance)}</span>
           </div>
-          {driverProfile?.avg_weekly_earnings > 0 && (
+          {driverProfile?.avg_weekly_earnings && driverProfile.avg_weekly_earnings > 0 && (
             <div className="profile-stat-row" style={{ borderBottom: 'none' }}>
               <span className="text-sm text-muted">Avg Weekly Earnings</span>
               <span className="font-serif font-bold">{formatCurrency(driverProfile.avg_weekly_earnings)}</span>

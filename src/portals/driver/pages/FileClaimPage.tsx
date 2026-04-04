@@ -5,7 +5,7 @@ import { fileClaim } from '@/services/api.ts';
 import { Card } from '@/components/Card/Card.tsx';
 import { Button } from '@/components/Button/Button.tsx';
 import { Input, Textarea } from '@/components/Input/Input.tsx';
-import { CloudRain, Megaphone, ArrowLeft, ArrowRight, Check, MapPin, CalendarBlank , CaretRight , MagnifyingGlass , House } from '@phosphor-icons/react';
+import { CloudRain, Megaphone, ArrowLeft, Check, MapPin, CalendarBlank } from '@phosphor-icons/react';
 import { formatCurrency } from '@/config/constants.ts';
 import './FileClaimPage.css';
 
@@ -26,8 +26,23 @@ export function FileClaimPage() {
 
   const totalSteps = 3;
 
+  const canContinue = () => {
+    if (step === 1) return !!claimType;
+    if (step === 2) return !!date && !!location.trim() && Number(amount) > 0;
+    return true;
+  };
+
   const handleSubmit = async () => {
     if (!user || !claimType) return;
+    const parsedAmount = Number(amount);
+    if (parsedAmount <= 0 || !Number.isFinite(parsedAmount)) {
+      setError('Claim amount must be a positive number.');
+      return;
+    }
+    if (!date || !location.trim()) {
+      setError('Please fill in all required fields.');
+      return;
+    }
     setSubmitting(true);
     setError('');
 
@@ -44,13 +59,13 @@ export function FileClaimPage() {
 
       if (err) {
         console.error('[FileClaimPage] Claim error:', err);
-        setError(typeof err === 'string' ? err : err.message || (err as any).details || 'Failed to submit claim. Please try again.');
+        setError(typeof err === 'string' ? err : (err as Error).message || (err as {details?: string}).details || 'Failed to submit claim. Please try again.');
       } else {
         setSubmitted(true);
       }
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error('[FileClaimPage] Unexpected error:', e);
-      setError(e?.message || 'An unexpected error occurred.');
+      setError((e as Error)?.message || 'An unexpected error occurred.');
     } finally {
       setSubmitting(false);
     }
@@ -173,7 +188,7 @@ export function FileClaimPage() {
           )}
           <div style={{ flex: 1 }} />
           {step < totalSteps ? (
-            <Button onClick={() => setStep(s => s + 1)} disabled={step === 1 && !claimType}>Continue</Button>
+            <Button onClick={() => setStep(s => s + 1)} disabled={!canContinue()}>Continue</Button>
           ) : (
             <Button onClick={handleSubmit} loading={submitting} icon={<Check size={14} />}>Submit Claim</Button>
           )}

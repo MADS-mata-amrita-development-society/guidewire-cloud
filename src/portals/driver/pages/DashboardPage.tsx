@@ -5,8 +5,10 @@ import { fetchDriverClaims, fetchWallet, fetchDriverProfile, fetchActiveDisrupti
 import { Card } from '@/components/Card/Card.tsx';
 import { Button } from '@/components/Button/Button.tsx';
 import { StatusBadge, TierBadge } from '@/components/Badge/Badge.tsx';
+import { LoadingSpinner } from '@/components/LoadingSpinner/LoadingSpinner.tsx';
 import { formatCurrency } from '@/config/constants.ts';
-import { ShieldCheck, Wallet, Plus, Warning, CaretRight, CloudRain, Megaphone , Buildings , SignOut , CalendarBlank , MagnifyingGlass , House } from '@phosphor-icons/react';
+import { ShieldCheck, Wallet, Plus, Warning, CaretRight, CloudRain, Megaphone } from '@phosphor-icons/react';
+import type { Claim, DriverProfile as DriverProfileType, DisruptionEvent } from '@/types/index.ts';
 import './DashboardPage.css';
 
 export function DashboardPage() {
@@ -14,10 +16,11 @@ export function DashboardPage() {
   const { profile, user } = useAuth();
 
   const [walletBalance, setWalletBalance] = useState(0);
-  const [driverProfile, setDriverProfile] = useState<any>(null);
-  const [recentClaims, setRecentClaims] = useState<any[]>([]);
-  const [disruptions, setDisruptions] = useState<any[]>([]);
+  const [driverProfile, setDriverProfile] = useState<DriverProfileType | null>(null);
+  const [recentClaims, setRecentClaims] = useState<Claim[]>([]);
+  const [disruptions, setDisruptions] = useState<DisruptionEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -29,16 +32,16 @@ export function DashboardPage() {
           fetchDriverClaims(user.id),
           fetchActiveDisruptions(),
         ]);
-        if (walletRes.error) console.error('[Dashboard] wallet:', walletRes.error);
-        if (profileRes.error) console.error('[Dashboard] profile:', profileRes.error);
-        if (claimsRes.error) console.error('[Dashboard] claims:', claimsRes.error);
-        if (disruptRes.error) console.error('[Dashboard] disruptions:', disruptRes.error);
+        if (walletRes.error || profileRes.error || claimsRes.error || disruptRes.error) {
+          console.error('[Dashboard] Data fetch errors:', { wallet: walletRes.error, profile: profileRes.error, claims: claimsRes.error, disruptions: disruptRes.error });
+        }
         setWalletBalance(walletRes.data?.balance ?? 0);
         setDriverProfile(profileRes.data);
         setRecentClaims((claimsRes.data || []).slice(0, 3));
         setDisruptions(disruptRes.data || []);
       } catch (e) {
         console.error('[Dashboard] Unexpected error:', e);
+        setError('Failed to load dashboard data. Please try again.');
       } finally {
         setLoading(false);
       }
@@ -54,9 +57,14 @@ export function DashboardPage() {
   };
 
   if (loading) {
+    return <LoadingSpinner fullScreen size="lg" />;
+  }
+
+  if (error) {
     return (
       <div className="loading-screen">
-        <div className="spinner spinner-lg" />
+        <p className="loading-screen-text">{error}</p>
+        <Button onClick={() => window.location.reload()}>Retry</Button>
       </div>
     );
   }
@@ -121,7 +129,7 @@ export function DashboardPage() {
               <button className="btn btn-ghost btn-sm" onClick={() => navigate('/claims')}>View All</button>
             </div>
             <div className="claims-list">
-              {recentClaims.map((claim: any) => (
+              {recentClaims.map((claim) => (
                 <Card key={claim.id} className="claim-item" hover>
                   <div className="claim-item-icon">
                     {claim.claim_type === 'natural_disaster' ? <CloudRain size={16} /> : <Megaphone size={16} />}

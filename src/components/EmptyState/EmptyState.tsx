@@ -24,7 +24,7 @@ export function EmptyState({
       <h3 className="empty-state-title">{title}</h3>
       <p className="empty-state-description">{description}</p>
       {actionLabel && onAction && (
-        <Button onClick={onAction}>{actionLabel}</Button>
+        <Button onPress={onAction}>{actionLabel}</Button>
       )}
     </div>
   );

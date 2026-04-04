@@ -28,6 +28,14 @@ export function Card({
       className={`card ${variantClass} ${hoverClass} ${interactiveClass} ${className}`.trim()}
       onClick={onClick}
       style={style}
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={onClick ? (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick();
+        }
+      } : undefined}
     >
       {children}
     </div>

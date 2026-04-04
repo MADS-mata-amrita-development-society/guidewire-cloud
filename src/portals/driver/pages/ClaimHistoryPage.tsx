@@ -4,28 +4,42 @@ import { fetchDriverClaims } from '@/services/api.ts';
 import { Card } from '@/components/Card/Card.tsx';
 import { StatusBadge } from '@/components/Badge/Badge.tsx';
 import { EmptyState } from '@/components/EmptyState/EmptyState.tsx';
+import { LoadingSpinner } from '@/components/LoadingSpinner/LoadingSpinner.tsx';
 import { formatCurrency } from '@/config/constants.ts';
 import { CloudRain, Megaphone, FileText } from '@phosphor-icons/react';
+import type { Claim } from '@/types/index.ts';
 
 type FilterStatus = 'all' | 'pending' | 'approved' | 'rejected';
 
 export function ClaimHistoryPage() {
   const { user } = useAuth();
-  const [claims, setClaims] = useState<any[]>([]);
+  const [claims, setClaims] = useState<Claim[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<FilterStatus>('all');
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
-    fetchDriverClaims(user.id).then(({ data }) => {
+    fetchDriverClaims(user.id).then(({ data, error: err }) => {
+      if (err) {
+        setError('Failed to load claims.');
+        console.error('[ClaimHistory] Error:', err);
+      }
       setClaims(data || []);
+      setLoading(false);
+    }).catch(() => {
+      setError('Failed to load claims.');
       setLoading(false);
     });
   }, [user]);
 
   if (loading) {
-    return <div className="loading-screen"><div className="spinner spinner-lg" /></div>;
+    return <LoadingSpinner fullScreen size="lg" />;
+  }
+
+  if (error) {
+    return <EmptyState icon={FileText} title="Error" description={error} />;
   }
 
   const filtered = filter === 'all' ? claims : claims.filter(c => c.status === filter);
@@ -52,7 +66,7 @@ export function ClaimHistoryPage() {
           <EmptyState icon={FileText} title="No claims found" description={`No ${filter === 'all' ? '' : filter} claims.`} />
         ) : (
           <div className="claims-list">
-            {filtered.map((claim: any) => (
+            {filtered.map((claim) => (
               <Card key={claim.id} className="claim-history-item" hover onClick={() => setExpandedId(expandedId === claim.id ? null : claim.id)}>
                 <div className="claim-history-row">
                   <div className="claim-item-icon">

@@ -40,9 +40,9 @@ export async function fileClaim(claim: {
       console.error('[fileClaim] Supabase error:', error);
     }
     return { data, error };
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.error('[fileClaim] Exception:', e);
-    return { data: null, error: { message: e?.message || 'Failed to submit claim' } };
+    return { data: null, error: { message: (e as Error)?.message || 'Failed to submit claim' } };
   }
 }
 
@@ -58,14 +58,14 @@ export async function fetchPendingClaims() {
 
   // Fetch driver profiles separately to avoid inner join issues
   if (data && data.length > 0) {
-    const driverIds = [...new Set(data.map((c: any) => c.driver_id))];
+    const driverIds = [...new Set(data.map((c: { driver_id: string }) => c.driver_id))];
     const { data: profiles } = await supabase
       .from('driver_profiles')
       .select('user_id, zone, city, tier')
       .in('user_id', driverIds);
 
     const profileMap = new Map((profiles || []).map(p => [p.user_id, p]));
-    data.forEach((claim: any) => {
+    data.forEach((claim: Record<string, unknown> & { driver_id: string; driver_profile?: unknown }) => {
       claim.driver_profile = profileMap.get(claim.driver_id) || null;
     });
   }
@@ -150,36 +150,26 @@ export async function fetchWalletTransactions(walletId: string) {
 }
 
 export async function adminTopUpWallet(userId: string, amount: number, description: string) {
-  // Find or create wallet
-  let { data: wallet } = await supabase
-    .from('wallets')
-    .select('id, balance')
-    .eq('user_id', userId)
-    .maybeSingle();
-
-  if (!wallet) {
-    const { data: newWallet, error: createErr } = await supabase
-      .from('wallets')
-      .insert({ user_id: userId, balance: 0 })
-      .select('id, balance')
-      .single();
-    if (createErr || !newWallet) return { error: createErr || { message: 'Could not create wallet' } };
-    wallet = newWallet;
+  if (amount <= 0) {
+    return { data: null, error: { message: 'Amount must be positive' } };
   }
 
-  await supabase
-    .from('wallets')
-    .update({ balance: wallet.balance + amount, updated_at: new Date().toISOString() })
-    .eq('id', wallet.id);
-
-  const { error } = await supabase.from('wallet_transactions').insert({
-    wallet_id: wallet.id,
-    amount,
-    type: 'credit',
-    description,
+  const { data, error } = await supabase.rpc('atomic_wallet_topup', {
+    p_user_id: userId,
+    p_amount: amount,
+    p_description: description || 'Admin top-up',
   });
 
-  return { error };
+  if (error) {
+    return { data: null, error };
+  }
+
+  // The RPC returns { error: "..." } on validation failure
+  if (data?.error) {
+    return { data: null, error: { message: data.error } };
+  }
+
+  return { data, error: null };
 }
 
 // ── Driver Profile ──

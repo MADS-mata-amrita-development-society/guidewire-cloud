@@ -3,14 +3,17 @@ import { useAuth } from '@/services/auth.tsx';
 import { fetchWallet, fetchWalletTransactions } from '@/services/api.ts';
 import { Card } from '@/components/Card/Card.tsx';
 import { EmptyState } from '@/components/EmptyState/EmptyState.tsx';
+import { LoadingSpinner } from '@/components/LoadingSpinner/LoadingSpinner.tsx';
 import { formatCurrency } from '@/config/constants.ts';
 import { ArrowCircleUp, ArrowCircleDown, Wallet as WalletIcon, Receipt } from '@phosphor-icons/react';
+import type { WalletTransaction } from '@/types/index.ts';
 
 export function WalletPage() {
   const { user } = useAuth();
   const [balance, setBalance] = useState(0);
-  const [transactions, setTransactions] = useState<any[]>([]);
+  const [transactions, setTransactions] = useState<WalletTransaction[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -24,6 +27,7 @@ export function WalletPage() {
         }
       } catch (e) {
         console.error('[WalletPage] Error:', e);
+        setError('Failed to load wallet data.');
       } finally {
         setLoading(false);
       }
@@ -32,7 +36,17 @@ export function WalletPage() {
   }, [user]);
 
   if (loading) {
-    return <div className="loading-screen"><div className="spinner spinner-lg" /></div>;
+    return <LoadingSpinner fullScreen size="lg" />;
+  }
+
+  if (error) {
+    return (
+      <div className="wallet-page">
+        <div className="page-content">
+          <EmptyState icon={Receipt} title="Error" description={error} />
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -52,7 +66,7 @@ export function WalletPage() {
           <EmptyState icon={Receipt} title="No transactions" description="Your wallet transactions will appear here." />
         ) : (
           <div className="transactions-list">
-            {transactions.map((tx: any) => (
+            {transactions.map((tx) => (
               <div key={tx.id} className="transaction-item">
                 <div className={`transaction-icon ${tx.type}`}>
                   {tx.type === 'credit' ? <ArrowCircleDown size={18} /> : <ArrowCircleUp size={18} />}

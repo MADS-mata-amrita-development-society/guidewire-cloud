@@ -2,46 +2,64 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/services/auth.tsx';
 import { fetchAllClaims, fetchDrivers } from '@/services/api.ts';
 import { Card } from '@/components/Card/Card.tsx';
+import { LoadingSpinner } from '@/components/LoadingSpinner/LoadingSpinner.tsx';
 import { formatCurrency } from '@/config/constants.ts';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
+import type { Claim, DriverWithProfile } from '@/types/index.ts';
+
+interface MonthData {
+  month: string;
+  claims: number;
+}
+
+interface PayoutData {
+  month: string;
+  amount: number;
+}
+
+interface TierData {
+  name: string;
+  value: number;
+  color: string;
+}
 
 export function AnalyticsPage() {
   const { profile } = useAuth();
-  const [claimsByMonth, setClaimsByMonth] = useState<any[]>([]);
-  const [tierDist, setTierDist] = useState<any[]>([]);
-  const [payoutsByMonth, setPayoutsByMonth] = useState<any[]>([]);
+  const [claimsByMonth, setClaimsByMonth] = useState<MonthData[]>([]);
+  const [tierDist, setTierDist] = useState<TierData[]>([]);
+  const [payoutsByMonth, setPayoutsByMonth] = useState<PayoutData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!profile?.company_id) { setLoading(false); return; }
     const load = async () => {
+      if (!profile?.company_id) { setLoading(false); return; }
       const [claimsRes, driversRes] = await Promise.all([
         fetchAllClaims({ company_id: profile.company_id! }),
         fetchDrivers(profile.company_id!),
       ]);
-      const claims = claimsRes.data || [];
-      const drivers = driversRes.data || [];
+      const claims: Claim[] = claimsRes.data || [];
+      const drivers: DriverWithProfile[] = (driversRes.data || []) as DriverWithProfile[];
 
       // Claims by month
       const monthMap: Record<string, number> = {};
       const payoutMap: Record<string, number> = {};
-      claims.forEach((c: any) => {
+      for (const c of claims) {
         const d = new Date(c.filed_at);
         const key = d.toLocaleString('default', { month: 'short', year: '2-digit' });
         monthMap[key] = (monthMap[key] || 0) + 1;
         if (c.status === 'approved' && c.approved_amount) {
           payoutMap[key] = (payoutMap[key] || 0) + c.approved_amount;
         }
-      });
+      }
       setClaimsByMonth(Object.entries(monthMap).map(([month, count]) => ({ month, claims: count })));
       setPayoutsByMonth(Object.entries(payoutMap).map(([month, amount]) => ({ month, amount })));
 
       // Tier distribution
       const tiers: Record<string, number> = { basic: 0, standard: 0, premium: 0 };
-      drivers.forEach((d: any) => {
+      for (const d of drivers) {
         const t = d.driver_profile?.tier || 'basic';
         tiers[t] = (tiers[t] || 0) + 1;
-      });
+      }
       setTierDist([
         { name: 'Basic', value: tiers.basic, color: '#94A3B8' },
         { name: 'Standard', value: tiers.standard, color: '#6AA1F5' },
@@ -54,7 +72,7 @@ export function AnalyticsPage() {
   }, [profile]);
 
   if (loading) {
-    return <div className="loading-screen"><div className="spinner spinner-lg" /></div>;
+    return <LoadingSpinner fullScreen size="lg" />;
   }
 
   const tooltipStyle = { borderRadius: '8px', border: '1px solid #E5E7EB', boxShadow: '0 4px 12px rgba(0,0,0,.06)', fontSize: '13px' };
@@ -120,7 +138,7 @@ export function AnalyticsPage() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                 <XAxis dataKey="month" fontSize={11} stroke="#9CA3AF" />
                 <YAxis fontSize={11} stroke="#9CA3AF" tickFormatter={v => `₹${(v / 1000).toFixed(0)}k`} />
-                <Tooltip contentStyle={tooltipStyle} formatter={(value: any) => [formatCurrency(Number(value)), 'Payout']} />
+                <Tooltip contentStyle={tooltipStyle} formatter={(value) => [formatCurrency(Number(value ?? 0)), 'Payout']} />
                 <Line type="monotone" dataKey="amount" stroke="#6AA1F5" strokeWidth={2} dot={{ r: 3, fill: '#6AA1F5' }} />
               </LineChart>
             </ResponsiveContainer>

@@ -6,15 +6,18 @@ import { Button } from '@/components/Button/Button.tsx';
 import { Input, Textarea } from '@/components/Input/Input.tsx';
 import { Modal } from '@/components/Modal/Modal.tsx';
 import { StatusBadge, TierBadge } from '@/components/Badge/Badge.tsx';
+import { LoadingSpinner } from '@/components/LoadingSpinner/LoadingSpinner.tsx';
+import { useToast } from '@/components/Toast/ToastProvider.tsx';
 import { formatCurrency } from '@/config/constants.ts';
 import { Check, X, CloudRain, Megaphone, CalendarBlank } from '@phosphor-icons/react';
-import type { Claim } from '@/types/index.ts';
+import type { ClaimWithDriver } from '@/types/index.ts';
 
 export function ClaimReviewPage() {
   const { user } = useAuth();
-  const [claims, setClaims] = useState<any[]>([]);
+  const toast = useToast();
+  const [claims, setClaims] = useState<ClaimWithDriver[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selected, setSelected] = useState<any>(null);
+  const [selected, setSelected] = useState<ClaimWithDriver | null>(null);
   const [approveAmount, setApproveAmount] = useState('');
   const [rejectReason, setRejectReason] = useState('');
   const [showApprove, setShowApprove] = useState(false);
@@ -26,7 +29,7 @@ export function ClaimReviewPage() {
     try {
       const { data, error } = await fetchPendingClaims();
       if (error) console.error('[ClaimReview] fetchPendingClaims error:', error);
-      setClaims(data || []);
+      setClaims((data || []) as ClaimWithDriver[]);
     } catch (e) {
       console.error('[ClaimReview] Unexpected error:', e);
     } finally {
@@ -41,10 +44,17 @@ export function ClaimReviewPage() {
 
   const handleApprove = async () => {
     if (!selected || !user) return;
+    const parsedAmount = Number(approveAmount);
+    if (parsedAmount <= 0 || !Number.isFinite(parsedAmount)) return;
     setProcessing(true);
     try {
-      const { error } = await approveClaim(selected.id, Number(approveAmount), user.id);
-      if (error) console.error('[ClaimReview] approveClaim error:', error);
+      const { error } = await approveClaim(selected.id, parsedAmount, user.id);
+      if (error) {
+        console.error('[ClaimReview] approveClaim error:', error);
+        toast.error('Failed to approve claim.');
+      } else {
+        toast.success(`Claim approved. ${formatCurrency(parsedAmount)} credited to driver.`);
+      }
     } finally {
       setProcessing(false);
       setShowApprove(false);
@@ -58,7 +68,12 @@ export function ClaimReviewPage() {
     setProcessing(true);
     try {
       const { error } = await rejectClaim(selected.id, rejectReason, user.id);
-      if (error) console.error('[ClaimReview] rejectClaim error:', error);
+      if (error) {
+        console.error('[ClaimReview] rejectClaim error:', error);
+        toast.error('Failed to reject claim.');
+      } else {
+        toast.success('Claim rejected.');
+      }
     } finally {
       setProcessing(false);
       setShowReject(false);
@@ -68,7 +83,7 @@ export function ClaimReviewPage() {
   };
 
   if (loading) {
-    return <div className="loading-screen"><div className="spinner spinner-lg" /></div>;
+    return <LoadingSpinner fullScreen size="lg" />;
   }
 
   return (
@@ -88,7 +103,7 @@ export function ClaimReviewPage() {
         </Card>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-          {claims.map((claim: any) => (
+          {claims.map((claim) => (
             <Card key={claim.id} className="claim-review-card">
               <div className="claim-review-header">
                 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
@@ -135,7 +150,7 @@ export function ClaimReviewPage() {
       )}
 
       <Modal isOpen={showApprove} onClose={() => setShowApprove(false)} title="Approve Claim"
-        footer={<><Button variant="secondary" onClick={() => setShowApprove(false)}>Cancel</Button><Button variant="success" onClick={handleApprove} loading={processing} icon={<Check size={12} />}>Confirm Approval</Button></>}>
+        footer={<><Button variant="secondary" onClick={() => setShowApprove(false)}>Cancel</Button><Button variant="success" onClick={handleApprove} loading={processing} disabled={!(Number(approveAmount) > 0 && Number.isFinite(Number(approveAmount)))} icon={<Check size={12} />}>Confirm Approval</Button></>}>
         {selected && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
             <p className="text-sm text-muted">Approve claim by <strong>{selected.driver?.full_name}</strong>. Amount will be credited to their wallet.</p>

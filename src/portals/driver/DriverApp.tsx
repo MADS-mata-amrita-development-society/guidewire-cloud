@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from '@/services/auth.tsx';
+import { ErrorBoundary } from '@/components/ErrorBoundary/ErrorBoundary.tsx';
+import { ToastProvider } from '@/components/Toast/ToastProvider.tsx';
 import { DriverLayout } from './layouts/DriverLayout.tsx';
 import { LoginPage } from './pages/LoginPage.tsx';
 import { DashboardPage } from './pages/DashboardPage.tsx';
@@ -29,6 +31,14 @@ function AppRoutes() {
     );
   }
 
+  if (profile.role !== 'driver') {
+    return (
+      <div className="loading-screen">
+        <p className="loading-screen-text">Access denied. This portal is for drivers only.</p>
+      </div>
+    );
+  }
+
   return (
     <Routes>
       <Route path="/login" element={<Navigate to="/" replace />} />
@@ -47,9 +57,13 @@ function AppRoutes() {
 export function DriverApp() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
+      <ToastProvider>
+        <ErrorBoundary>
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
+        </ErrorBoundary>
+      </ToastProvider>
     </AuthProvider>
   );
 }
