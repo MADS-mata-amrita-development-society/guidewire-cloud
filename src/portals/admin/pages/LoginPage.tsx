@@ -5,8 +5,8 @@ export function LoginPage() {
   return (
     <PortalLoginPage
       portalName="Admin Portal"
-      placeholder="admin@aegis.com"
-      footerText="Aegis Insurance Admin Console"
+      placeholder="admin@portal.com"
+      footerText="Admin Console"
     />
   );
 }

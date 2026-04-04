@@ -324,14 +324,18 @@
   height: var(--topbar-height);
 }
 
+.sidebar-logo {
+  width: 38px;
+  height: auto;
+  object-fit: contain;
+}
+
 .sidebar-brand {
   font-family: var(--font-serif);
   font-size: var(--text-lg);
   font-weight: var(--weight-bold);
   color: var(--aegis-gray-900);
 }
-
-.sidebar-brand span { color: var(--aegis-500); }
 
 .sidebar-nav {
   flex: 1;

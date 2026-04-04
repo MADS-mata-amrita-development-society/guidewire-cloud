@@ -12,7 +12,7 @@ const navItems: SidebarNavItem[] = [
 export function ManagerLayout() {
   return (
     <SidebarLayout
-      portalName="Manager"
+      portalName="manager"
       navItems={navItems}
       sectionTitle="Navigation"
       layoutClassName="manager-layout"

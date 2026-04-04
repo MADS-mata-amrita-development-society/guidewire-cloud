@@ -35,7 +35,7 @@ export function getPortalFromHostname(): Portal {
  * App-wide constants
  */
 export const APP_NAME = 'Aegis';
-export const APP_TAGLINE = 'AI-Powered Income Insurance for Gig Workers';
+export const APP_TAGLINE = 'Gig workers deserve job security.';
 
 export const CURRENCY_SYMBOL = '₹';
 export const CURRENCY_CODE = 'INR';

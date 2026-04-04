@@ -24,16 +24,18 @@
 }
 
 .login-logo {
-  width: 44px;
-  height: 44px;
-  border-radius: var(--radius-lg);
-  background: linear-gradient(180deg, #8DBDFF, #6AA1F5);
-  color: var(--aegis-white);
+  width: fit-content;
+  height: auto;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto var(--space-3);
-  box-shadow: var(--shadow-btn);
+}
+
+.login-logo-image {
+  width: 60px;
+  height: auto;
+  object-fit: contain;
 }
 
 .login-title {

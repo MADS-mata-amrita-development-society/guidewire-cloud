@@ -1,6 +1,7 @@
 import { Outlet, NavLink } from 'react-router-dom';
 import { useAuth } from '@/services/auth.tsx';
-import { Shield, SignOut } from '@phosphor-icons/react';
+import aegisLogo from '@/assets/aegis.png';
+import { SignOut } from '@phosphor-icons/react';
 import type { Icon as PhosphorIconType } from '@phosphor-icons/react';
 
 export interface SidebarNavItem {
@@ -29,15 +30,8 @@ export function SidebarLayout({
     <div className={layoutClassName}>
       <aside className="sidebar">
         <div className="sidebar-header">
-          <div style={{
-            width: 32, height: 32, borderRadius: 'var(--radius-md)',
-            background: 'linear-gradient(180deg, #8DBDFF, #6AA1F5)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: 'white',
-          }}>
-            <Shield size={16} />
-          </div>
-          <div className="sidebar-brand"><span>Aegis</span> {portalName}</div>
+          <img src={aegisLogo} alt="Aegis logo" className="sidebar-logo" />
+          <div className="sidebar-brand">{portalName}</div>
         </div>
 
         <nav className="sidebar-nav">

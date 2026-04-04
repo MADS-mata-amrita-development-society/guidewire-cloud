@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/services/auth.tsx';
 import { Button } from '@/components/Button/Button.tsx';
 import { Input } from '@/components/Input/Input.tsx';
-import { Shield, Envelope, Lock } from '@phosphor-icons/react';
+import aegisLogo from '@/assets/aegis.png';
+import { Envelope, Lock } from '@phosphor-icons/react';
 
 interface PortalLoginPageProps {
   portalName: string;
@@ -14,7 +15,7 @@ interface PortalLoginPageProps {
 export function PortalLoginPage({
   portalName,
   placeholder = 'user@example.com',
-  footerText = 'Protected by Aegis Insurance Systems',
+  footerText = 'Protected by Insurance Systems',
 }: PortalLoginPageProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -41,9 +42,8 @@ export function PortalLoginPage({
       <div className="login-card">
         <div className="login-brand">
           <div className="login-logo">
-            <Shield size={24} />
+            <img src={aegisLogo} alt="Aegis logo" className="login-logo-image" />
           </div>
-          <h1 className="login-title font-serif">Aegis</h1>
           <p className="login-subtitle">{portalName}</p>
         </div>
 
