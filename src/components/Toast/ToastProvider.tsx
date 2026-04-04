@@ -1,7 +1,8 @@
+/* eslint-disable react-refresh/only-export-components */
 import type { ReactNode } from 'react';
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, useRef } from 'react';
 import type { ToastMessage } from '@/types/index.ts';
-import { X, CheckCircle, WarningCircle, Warning, Info , Buildings , SignOut , CalendarBlank , CaretRight , MagnifyingGlass , House } from '@phosphor-icons/react';
+import { X, CheckCircle, WarningCircle, Warning, Info } from '@phosphor-icons/react';
 
 interface ToastContextType {
   toasts: ToastMessage[];
@@ -13,7 +14,7 @@ interface ToastContextType {
   info: (message: string) => void;
 }
 
-const ToastContext = createContext<ToastContextType | null>(null);
+export const ToastContext = createContext<ToastContextType | null>(null);
 
 export function useToast(): ToastContextType {
   const ctx = useContext(ToastContext);
@@ -21,13 +22,13 @@ export function useToast(): ToastContextType {
   return ctx;
 }
 
-let toastId = 0;
-
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
+  const toastIdRef = useRef(0);
 
   const addToast = useCallback((toast: Omit<ToastMessage, 'id'>) => {
-    const id = `toast-${++toastId}`;
+    toastIdRef.current += 1;
+    const id = `toast-${toastIdRef.current}`;
     const newToast: ToastMessage = { ...toast, id };
     setToasts(prev => [...prev, newToast]);
 

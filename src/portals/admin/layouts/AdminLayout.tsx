@@ -1,6 +1,6 @@
 import { Outlet, NavLink } from 'react-router-dom';
 import { useAuth } from '@/services/auth.tsx';
-import { SquaresFour, MagnifyingGlass, Buildings, Users, Wallet, Shield, SignOut , CalendarBlank , CaretRight , House } from '@phosphor-icons/react';
+import { SquaresFour, MagnifyingGlass, Buildings, Users, Wallet, Shield, SignOut } from '@phosphor-icons/react';
 
 const navItems = [
   { to: '/', icon: SquaresFour, label: 'Dashboard', end: true },

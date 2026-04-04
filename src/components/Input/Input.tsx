@@ -1,12 +1,26 @@
-import type { ReactNode, InputHTMLAttributes, TextareaHTMLAttributes, SelectHTMLAttributes } from 'react';
+import type { ReactNode, SelectHTMLAttributes, InputHTMLAttributes, TextareaHTMLAttributes } from 'react';
+import {
+  TextField,
+  Label,
+  Input as AriaInput,
+  TextArea as AriaTextArea,
+  Text,
+  Select as AriaSelect,
+  Button as AriaButton,
+  SelectValue,
+  Popover,
+  ListBox,
+  ListBoxItem
+} from 'react-aria-components';
 
-// ── Text Input ──
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
   label?: string;
   error?: string;
   helper?: string;
   icon?: ReactNode;
   required?: boolean;
+  value?: string;
+  onChange?: (e: { target: { value: string } }) => void;
 }
 
 export function Input({
@@ -17,46 +31,55 @@ export function Input({
   required,
   className = '',
   id,
+  onChange,
+  value,
   ...props
 }: InputProps) {
   const inputId = id || `input-${label?.toLowerCase().replace(/\s/g, '-')}`;
 
+  const handleChange = (val: string) => {
+    if (onChange) {
+      onChange({ target: { value: val } });
+    }
+  };
+
   return (
-    <div className="input-group">
-      {label && (
-        <label className="input-label" htmlFor={inputId}>
-          {label}
-          {required && <span className="required">*</span>}
-        </label>
-      )}
-      {icon ? (
-        <div className="input-with-icon">
-          <span className="input-icon">{icon}</span>
-          <input
-            id={inputId}
-            className={`input ${error ? 'input-error' : ''} ${className}`}
-            {...props}
-          />
-        </div>
-      ) : (
-        <input
-          id={inputId}
-          className={`input ${error ? 'input-error' : ''} ${className}`}
-          {...props}
-        />
-      )}
-      {error && <span className="input-error-text">{error}</span>}
-      {helper && !error && <span className="input-helper">{helper}</span>}
+    <div className={`input-group ${className}`}>
+      <TextField
+        id={inputId}
+        value={value}
+        onChange={handleChange}
+        isRequired={required}
+        isInvalid={!!error}
+      >
+        {label && (
+          <Label className="input-label">
+            {label}
+            {required && <span className="required">*</span>}
+          </Label>
+        )}
+        {icon ? (
+          <div className="input-with-icon">
+            <span className="input-icon">{icon}</span>
+            <AriaInput className={`input ${error ? 'input-error' : ''}`} {...props} />
+          </div>
+        ) : (
+          <AriaInput className={`input ${error ? 'input-error' : ''}`} {...props} />
+        )}
+        {error && <Text slot="errorMessage" className="input-error-text">{error}</Text>}
+        {helper && !error && <Text slot="description" className="input-helper">{helper}</Text>}
+      </TextField>
     </div>
   );
 }
 
-// ── Textarea ──
-interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
+interface TextareaProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange'> {
   label?: string;
   error?: string;
   helper?: string;
   required?: boolean;
+  value?: string;
+  onChange?: (e: { target: { value: string } }) => void;
 }
 
 export function Textarea({
@@ -66,37 +89,50 @@ export function Textarea({
   required,
   className = '',
   id,
+  onChange,
+  value,
   ...props
 }: TextareaProps) {
   const textareaId = id || `textarea-${label?.toLowerCase().replace(/\s/g, '-')}`;
 
+  const handleChange = (val: string) => {
+    if (onChange) {
+      onChange({ target: { value: val } });
+    }
+  };
+
   return (
-    <div className="input-group">
-      {label && (
-        <label className="input-label" htmlFor={textareaId}>
-          {label}
-          {required && <span className="required">*</span>}
-        </label>
-      )}
-      <textarea
+    <div className={`input-group ${className}`}>
+      <TextField
         id={textareaId}
-        className={`input textarea ${error ? 'input-error' : ''} ${className}`}
-        {...props}
-      />
-      {error && <span className="input-error-text">{error}</span>}
-      {helper && !error && <span className="input-helper">{helper}</span>}
+        value={value}
+        onChange={handleChange}
+        isRequired={required}
+        isInvalid={!!error}
+      >
+        {label && (
+          <Label className="input-label">
+            {label}
+            {required && <span className="required">*</span>}
+          </Label>
+        )}
+        <AriaTextArea className={`input textarea ${error ? 'input-error' : ''}`} {...props} />
+        {error && <Text slot="errorMessage" className="input-error-text">{error}</Text>}
+        {helper && !error && <Text slot="description" className="input-helper">{helper}</Text>}
+      </TextField>
     </div>
   );
 }
 
-// ── Select ──
-interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
+interface SelectProps extends Omit<SelectHTMLAttributes<HTMLSelectElement>, 'onChange'> {
   label?: string;
   error?: string;
   helper?: string;
   required?: boolean;
   options: { value: string; label: string }[];
   placeholder?: string;
+  value?: string;
+  onChange?: (e: { target: { value: string } }) => void;
 }
 
 export function Select({
@@ -108,36 +144,49 @@ export function Select({
   placeholder,
   className = '',
   id,
-  ...props
+  onChange,
+  value,
 }: SelectProps) {
   const selectId = id || `select-${label?.toLowerCase().replace(/\s/g, '-')}`;
 
+  const handleSelectionChange = (val: import('react').Key | null) => {
+    if (onChange && val !== null) {
+      onChange({ target: { value: String(val) } });
+    }
+  };
+
   return (
-    <div className="input-group">
-      {label && (
-        <label className="input-label" htmlFor={selectId}>
-          {label}
-          {required && <span className="required">*</span>}
-        </label>
-      )}
-      <select
+    <div className={`input-group ${className}`}>
+      <AriaSelect
         id={selectId}
-        className={`input select ${error ? 'input-error' : ''} ${className}`}
-        {...props}
+        selectedKey={value}
+        onSelectionChange={handleSelectionChange}
+        isRequired={required}
+        isInvalid={!!error}
       >
-        {placeholder && (
-          <option value="" disabled>
-            {placeholder}
-          </option>
+        {label && (
+          <Label className="input-label">
+            {label}
+            {required && <span className="required">*</span>}
+          </Label>
         )}
-        {options.map(opt => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
-      {error && <span className="input-error-text">{error}</span>}
-      {helper && !error && <span className="input-helper">{helper}</span>}
+        <AriaButton className={`input select ${error ? 'input-error' : ''}`}>
+          <SelectValue>
+            {({ selectedText }) => selectedText || placeholder || 'Select an option'}
+          </SelectValue>
+        </AriaButton>
+        {error && <Text slot="errorMessage" className="input-error-text">{error}</Text>}
+        {helper && !error && <Text slot="description" className="input-helper">{helper}</Text>}
+        <Popover className="popover">
+          <ListBox className="listbox">
+            {options.map((opt) => (
+              <ListBoxItem key={opt.value} id={opt.value} className="listbox-item">
+                {opt.label}
+              </ListBoxItem>
+            ))}
+          </ListBox>
+        </Popover>
+      </AriaSelect>
     </div>
   );
 }

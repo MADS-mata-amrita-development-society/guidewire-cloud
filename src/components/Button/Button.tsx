@@ -1,12 +1,16 @@
-import type { ReactNode, ButtonHTMLAttributes } from 'react';
+import type { ReactNode } from 'react';
+import { Button as AriaButton } from 'react-aria-components';
+import type { ButtonProps as AriaButtonProps, ButtonRenderProps } from 'react-aria-components';
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends Omit<AriaButtonProps, 'children' | 'className'> {
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'success';
   size?: 'sm' | 'md' | 'lg';
   fullWidth?: boolean;
   loading?: boolean;
+  disabled?: boolean;
   icon?: ReactNode;
-  children: ReactNode;
+  children: ReactNode | ((renderProps: Omit<ButtonRenderProps, 'defaultChildren'>) => ReactNode);
+  className?: string | ((renderProps: Omit<ButtonRenderProps, 'defaultClassName'>) => string);
 }
 
 export function Button({
@@ -18,6 +22,7 @@ export function Button({
   children,
   className = '',
   disabled,
+  isDisabled,
   ...props
 }: ButtonProps) {
   const variantClass = `btn-${variant}`;
@@ -25,17 +30,32 @@ export function Button({
   const fullClass = fullWidth ? 'btn-full' : '';
 
   return (
-    <button
-      className={`btn ${variantClass} ${sizeClass} ${fullClass} ${className}`.trim()}
-      disabled={disabled || loading}
+    <AriaButton
+      className={(renderProps) => {
+        const baseClass = `btn ${variantClass} ${sizeClass} ${fullClass}`;
+        const computedClass = typeof className === 'function' ? className(renderProps) : className;
+        
+        return [
+          baseClass,
+          computedClass,
+          renderProps.isHovered ? 'hover' : '',
+          renderProps.isPressed ? 'active' : '',
+          renderProps.isFocused ? 'focus-visible' : ''
+        ].filter(Boolean).join(' ').trim();
+      }}
+      isDisabled={disabled || isDisabled || loading}
       {...props}
     >
-      {loading ? (
-        <span className="spinner spinner-sm" style={{ borderTopColor: 'currentColor' }} />
-      ) : icon ? (
-        icon
-      ) : null}
-      {children}
-    </button>
+      {(renderProps) => (
+        <>
+          {loading ? (
+            <span className="spinner spinner-sm" style={{ borderTopColor: 'currentColor' }} />
+          ) : icon ? (
+            icon
+          ) : null}
+          {typeof children === 'function' ? children(renderProps) : children}
+        </>
+      )}
+    </AriaButton>
   );
 }

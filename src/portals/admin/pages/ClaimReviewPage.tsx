@@ -8,6 +8,7 @@ import { Modal } from '@/components/Modal/Modal.tsx';
 import { StatusBadge, TierBadge } from '@/components/Badge/Badge.tsx';
 import { formatCurrency } from '@/config/constants.ts';
 import { Check, X, CloudRain, Megaphone, CalendarBlank } from '@phosphor-icons/react';
+import type { Claim } from '@/types/index.ts';
 
 export function ClaimReviewPage() {
   const { user } = useAuth();

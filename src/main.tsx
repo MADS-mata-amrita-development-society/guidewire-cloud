@@ -9,7 +9,7 @@ import { AdminApp } from '@/portals/admin/AdminApp.tsx';
 import { ManagerApp } from '@/portals/manager/ManagerApp.tsx';
 import { LandingPage } from '@/landing/LandingPage.tsx';
 
-function App() {
+export function App() {
   const portal = getPortalFromHostname();
 
   let PortalComponent;
