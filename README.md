@@ -105,3 +105,24 @@ Our system already partially addresses this issue. A driver cannot keep claiming
 **Pitch Video**: https://youtu.be/zgT5l1EeISU
 
 ---
+
+## 7. AI Backend Implementation (Current)
+
+This repository now includes a full AI-backed claims workflow:
+
+- **Database automation** in `supabase/ai-automation.sql`
+  - claim AI queue
+  - AI evaluation logs
+  - decision audit trail
+  - premium computation engine
+- **Python worker backend** in `backend/`
+  - factor extraction
+  - weather + news checks
+  - deterministic risk scoring
+  - optional LLM reasoning
+- **Frontend integration** for premium visibility across Driver/Manager/Admin portals.
+
+Detailed implementation docs:
+- `docs/ai-claims-backend/`
+
+---

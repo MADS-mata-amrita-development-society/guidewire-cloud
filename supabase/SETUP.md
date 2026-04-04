@@ -5,6 +5,7 @@
 1. Create a Supabase project at [supabase.com](https://supabase.com).
 2. Open **SQL Editor**.
 3. Run `supabase/schema.sql`.
+4. Run `supabase/ai-automation.sql` for AI queue + premium engine.
 
 If you already ran an older schema version and see:
 `infinite recursion detected in policy for relation "users"`
@@ -82,6 +83,23 @@ Open:
 4. **Sign in as manager** and verify company-level claims/drivers views.
 
 ## 8. Architecture Notes
+
+### AI Automation
+The AI backend is implemented as a background worker that reads `claim_ai_queue`, evaluates factors, and writes decisions using secure RPC functions:
+- `claim_ai_dequeue`
+- `apply_ai_claim_decision`
+- `claim_ai_mark_failed`
+
+Claims can now be auto-approved/rejected or left as pending for manual review.
+
+### Premium Engine
+Premiums are computed inside Postgres and stored in `driver_profiles.premium_amount`.
+
+Premium recompute functions:
+- `recompute_driver_premium(driver_id)`
+- `recompute_all_driver_premiums()`
+
+Premium is refreshed automatically on tier, earnings, zone/city, and claim-history updates.
 
 ### Atomic Claim Approval
 When an admin approves a claim, only the `claims` row is updated. A PostgreSQL trigger (`trg_claim_approval_credit`) then atomically:

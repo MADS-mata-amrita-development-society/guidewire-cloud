@@ -58,6 +58,22 @@ export interface DriverProfile {
   metadata: Record<string, unknown> | null;
 }
 
+export interface ClaimAiEvaluation {
+  id: string;
+  claim_id: string;
+  suggested_decision: 'approve' | 'reject' | 'manual_review';
+  applied_decision: 'approved' | 'rejected' | 'pending' | null;
+  confidence: number;
+  risk_score: number;
+  rationale: string;
+  factors: Record<string, unknown> | null;
+  model_provider: string;
+  model_name: string;
+  model_version: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Wallet {
   id: string;
   user_id: string;
@@ -121,6 +137,7 @@ export interface DisruptionEvent {
 export interface ClaimWithDriver extends Claim {
   driver?: User;
   driver_profile?: DriverProfile;
+  ai_evaluation?: ClaimAiEvaluation | null;
   company?: Company;
   reviewer?: User;
 }

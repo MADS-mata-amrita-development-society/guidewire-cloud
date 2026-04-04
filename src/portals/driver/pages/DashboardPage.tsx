@@ -6,7 +6,7 @@ import { Card } from '@/components/Card/Card.tsx';
 import { Button } from '@/components/Button/Button.tsx';
 import { StatusBadge, TierBadge } from '@/components/Badge/Badge.tsx';
 import { LoadingSpinner } from '@/components/LoadingSpinner/LoadingSpinner.tsx';
-import { formatCurrency } from '@/config/constants.ts';
+import { estimateMaxClaimAmount, formatCurrency, getTierCoveragePercent } from '@/config/constants.ts';
 import { ShieldCheck, Wallet, Plus, Warning, CaretRight, CloudRain, Megaphone } from '@phosphor-icons/react';
 import type { Claim, DriverProfile as DriverProfileType, DisruptionEvent } from '@/types/index.ts';
 import './DashboardPage.css';
@@ -70,7 +70,9 @@ export function DashboardPage() {
   }
 
   const tier = driverProfile?.tier || 'basic';
-  const coverageMap: Record<string, number> = { basic: 50, standard: 75, premium: 100 };
+  const coveragePercent = getTierCoveragePercent(tier);
+  const premiumAmount = driverProfile?.premium_amount ?? 0;
+  const maxClaimAmount = estimateMaxClaimAmount(driverProfile?.avg_weekly_earnings ?? 0, tier);
 
   return (
     <div className="driver-dashboard">
@@ -112,8 +114,10 @@ export function DashboardPage() {
           </div>
           <h3 className="policy-title">Active Policy</h3>
           <p className="policy-coverage text-sm text-muted">
-            Covers up to {coverageMap[tier] || 50}% of average earnings
+            Covers up to {coveragePercent}% of average earnings
           </p>
+          <p className="policy-coverage text-sm text-muted">Weekly premium: {formatCurrency(premiumAmount)}</p>
+          <p className="policy-coverage text-sm text-muted">Estimated max claim: {formatCurrency(maxClaimAmount)}</p>
         </Card>
 
         {/* File Claim CTA */}

@@ -62,7 +62,7 @@ export function DriversListPage() {
         <div className="table-container">
           <table className="table">
             <thead>
-              <tr><th>Driver</th><th>Email</th><th>Zone</th><th>Tier</th><th>Balance</th></tr>
+              <tr><th>Driver</th><th>Email</th><th>Zone</th><th>Tier</th><th>Premium</th><th>Balance</th></tr>
             </thead>
             <tbody>
               {filtered.map((d) => (
@@ -71,6 +71,7 @@ export function DriversListPage() {
                   <td className="text-muted">{d.email}</td>
                   <td>{d.driver_profile?.zone || '—'}</td>
                   <td>{d.driver_profile?.tier ? <TierBadge tier={d.driver_profile.tier} /> : '—'}</td>
+                  <td className="font-serif">{formatCurrency(d.driver_profile?.premium_amount ?? 0)}</td>
                   <td className="font-serif">{formatCurrency(d.wallet?.balance ?? 0)}</td>
                 </tr>
               ))}

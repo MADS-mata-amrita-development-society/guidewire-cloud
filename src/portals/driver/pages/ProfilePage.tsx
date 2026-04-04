@@ -7,7 +7,7 @@ import { Select } from '@/components/Input/Input.tsx';
 import { TierBadge } from '@/components/Badge/Badge.tsx';
 import { LoadingSpinner } from '@/components/LoadingSpinner/LoadingSpinner.tsx';
 import { useToast } from '@/components/Toast/ToastProvider.tsx';
-import { formatCurrency } from '@/config/constants.ts';
+import { estimateMaxClaimAmount, formatCurrency } from '@/config/constants.ts';
 import { Envelope, Phone, MapPin, Shield, FloppyDisk, SignOut } from '@phosphor-icons/react';
 import type { InsuranceTier, DriverProfile as DriverProfileType } from '@/types/index.ts';
 
@@ -122,11 +122,21 @@ export function ProfilePage() {
             <span className="text-sm text-muted">Wallet Balance</span>
             <span className="font-serif font-bold">{formatCurrency(balance)}</span>
           </div>
+          <div className="profile-stat-row">
+            <span className="text-sm text-muted">Weekly Premium</span>
+            <span className="font-serif font-bold">{formatCurrency(driverProfile?.premium_amount || 0)}</span>
+          </div>
           {driverProfile?.avg_weekly_earnings && driverProfile.avg_weekly_earnings > 0 && (
-            <div className="profile-stat-row" style={{ borderBottom: 'none' }}>
+            <>
+            <div className="profile-stat-row">
               <span className="text-sm text-muted">Avg Weekly Earnings</span>
               <span className="font-serif font-bold">{formatCurrency(driverProfile.avg_weekly_earnings)}</span>
             </div>
+            <div className="profile-stat-row" style={{ borderBottom: 'none' }}>
+              <span className="text-sm text-muted">Tier Max Claim (est.)</span>
+              <span className="font-serif font-bold">{formatCurrency(estimateMaxClaimAmount(driverProfile.avg_weekly_earnings, tier))}</span>
+            </div>
+            </>
           )}
         </Card>
 

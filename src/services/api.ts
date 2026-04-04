@@ -56,17 +56,27 @@ export async function fetchPendingClaims() {
     .eq('status', 'pending')
     .order('filed_at', { ascending: false });
 
-  // Fetch driver profiles separately to avoid inner join issues
+  // Fetch driver profiles + AI evaluations separately to avoid join edge cases.
   if (data && data.length > 0) {
     const driverIds = [...new Set(data.map((c: { driver_id: string }) => c.driver_id))];
+    const claimIds = [...new Set(data.map((c: { id: string }) => c.id))];
+
     const { data: profiles } = await supabase
       .from('driver_profiles')
-      .select('user_id, zone, city, tier')
+      .select('user_id, zone, city, tier, avg_weekly_earnings, premium_amount')
       .in('user_id', driverIds);
 
+    const { data: evaluations } = await supabase
+      .from('claim_ai_evaluations')
+      .select('*')
+      .in('claim_id', claimIds);
+
     const profileMap = new Map((profiles || []).map(p => [p.user_id, p]));
-    data.forEach((claim: Record<string, unknown> & { driver_id: string; driver_profile?: unknown }) => {
+    const evaluationMap = new Map((evaluations || []).map((e: { claim_id: string }) => [e.claim_id, e]));
+
+    data.forEach((claim: Record<string, unknown> & { id: string; driver_id: string; driver_profile?: unknown; ai_evaluation?: unknown }) => {
       claim.driver_profile = profileMap.get(claim.driver_id) || null;
+      claim.ai_evaluation = evaluationMap.get(claim.id) || null;
     });
   }
 
@@ -188,7 +198,27 @@ export async function updateDriverTier(userId: string, tier: string) {
     .from('driver_profiles')
     .update({ tier, tier_updated_at: new Date().toISOString() })
     .eq('user_id', userId);
-  return { error };
+
+  if (error) return { error };
+
+  // Force fresh premium in case triggers were added after existing deployments.
+  await supabase.rpc('recompute_driver_premium', { p_driver_id: userId });
+
+  return { error: null };
+}
+
+export async function recomputeDriverPremium(userId: string) {
+  const { data, error } = await supabase.rpc('recompute_driver_premium', { p_driver_id: userId });
+  return { data: Number(data || 0), error };
+}
+
+export async function fetchClaimAiEvaluations(claimIds: string[]) {
+  if (!claimIds.length) return { data: [], error: null };
+  const { data, error } = await supabase
+    .from('claim_ai_evaluations')
+    .select('*')
+    .in('claim_id', claimIds);
+  return { data, error };
 }
 
 // ── Companies ──
